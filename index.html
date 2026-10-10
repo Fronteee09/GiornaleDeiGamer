@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Giornale Dei Gamer</title>
+<link rel="icon" href="logo.png">
+<style>
+  * { box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; }
+  body {
+    margin: 0;
+    min-height: 100vh;
+    font-family: "Segoe UI", system-ui, -apple-system, Roboto, sans-serif;
+    color: #e0f2fe;
+    line-height: 1.6;
+    overflow-x: hidden;
+    background:
+      radial-gradient(circle at 15% 8%, rgba(52, 211, 153, 0.35), transparent 38%),
+      radial-gradient(circle at 90% 35%, rgba(16, 185, 129, 0.35), transparent 42%),
+      radial-gradient(circle at 50% 85%, rgba(5, 150, 105, 0.25), transparent 50%),
+      linear-gradient(160deg, #022c22 0%, #064e3b 50%, #022018 100%);
+    background-attachment: fixed;
+  }
+
+  .wrap { 
+    width: 100%; 
+    max-width: 760px; 
+    margin: 0 auto; 
+    padding: 18px; 
+  }
+
+  /* Effetto Vetro Aero / Glassmorphism Emerald */
+  .glass {
+    background: linear-gradient(180deg, rgba(167, 243, 208, 0.22), rgba(6, 78, 59, 0.45));
+    border: 1px solid rgba(110, 231, 183, 0.45);
+    border-radius: 16px;
+    box-shadow: 0 8px 28px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(209, 250, 229, 0.5);
+    -webkit-backdrop-filter: blur(12px);
+    backdrop-filter: blur(12px);
+    padding: 20px;
+    margin-bottom: 18px;
+  }
+
+  header.glass { 
+    margin-top: 24px; 
+    text-align: center; 
+    padding: 36px 20px; 
+  }
+
+  .logo {
+    width: 120px;
+    height: 120px;
+    object-fit: cover;
+    border-radius: 50%;
+    border: 2px solid rgba(110, 231, 183, 0.8);
+    box-shadow: 0 0 20px rgba(52, 211, 153, 0.8);
+    margin-bottom: 14px;
+    background-color: #064e3b;
+  }
+
+  h1 {
+    margin: 0 0 10px;
+    font-size: clamp(2rem, 9vw, 3.4rem);
+    line-height: 1.1;
+    color: #ffffff;
+    text-shadow: 0 0 16px rgba(52, 211, 153, 0.9), 0 2px 4px rgba(0, 0, 0, 0.8);
+  }
+
+  header p { 
+    margin: 0 0 22px; 
+    color: #a7f3d0; 
+    font-size: 1.1rem; 
+  }
+
+  .btn-group {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+  }
+
+  /* Bottoni stile Windows Aero Verde */
+  .btn {
+    display: inline-block;
+    min-height: 48px;
+    padding: 12px 28px;
+    color: #ffffff;
+    font-weight: 600;
+    text-decoration: none;
+    text-shadow: 0 1px 2px rgba(0, 40, 20, 0.9);
+    border: 1px solid #6ee7b7;
+    border-radius: 999px;
+    background: linear-gradient(180deg, #34d399 0%, #10b981 50%, #059669 51%, #10b981 100%);
+    box-shadow: 0 0 16px rgba(52, 211, 153, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.7);
+    transition: all 0.2s ease;
+  }
+
+  .btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 0 22px rgba(52, 211, 153, 0.8), inset 0 1px 0 rgba(255, 255, 255, 0.9);
+  }
+
+  .btn-secondary {
+    background: linear-gradient(180deg, rgba(16, 185, 129, 0.4) 0%, rgba(6, 78, 59, 0.7) 100%);
+    border: 1px solid rgba(110, 231, 183, 0.4);
+    box-shadow: 0 0 12px rgba(52, 211, 153, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.3);
+  }
+
+  .btn-secondary:hover {
+    background: linear-gradient(180deg, rgba(16, 185, 129, 0.6) 0%, rgba(6, 78, 59, 0.85) 100%);
+  }
+
+  .btn:active { 
+    filter: brightness(.9); 
+    transform: translateY(0);
+  }
+
+  .btn:focus-visible, a:focus-visible { 
+    outline: 3px solid #6ee7b7; 
+    outline-offset: 2px; 
+  }
+
+  h2 { 
+    margin: 0 0 10px; 
+    font-size: 1.35rem; 
+    color: #ffffff; 
+    text-shadow: 0 0 10px rgba(52, 211, 153, 0.6); 
+  }
+
+  p { 
+    margin: 0 0 10px; 
+    color: #a7f3d0; 
+  }
+
+  .grid { 
+    display: grid; 
+    gap: 14px; 
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); 
+  }
+
+  .card {
+    background: rgba(4, 47, 38, 0.55);
+    border: 1px solid rgba(110, 231, 183, 0.35);
+    border-radius: 12px;
+    padding: 14px;
+  }
+
+  .card h3 { 
+    margin: 0 0 4px; 
+    font-size: 1.05rem; 
+    color: #ffffff; 
+  }
+
+  .card p { 
+    margin: 0; 
+    color: #a7f3d0; 
+  }
+
+  ul { 
+    margin: 0; 
+    padding-left: 1.2em; 
+  }
+
+  li { 
+    margin-bottom: 6px; 
+    color: #a7f3d0;
+  }
+
+  footer { 
+    text-align: center; 
+    color: #6ee7b7; 
+    font-size: .9rem; 
+    padding: 10px 0 40px; 
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="glass">
+    <img class="logo" src="logo.png" alt="Logo Giornale Dei Gamer" onerror="this.src='https://via.placeholder.com/120/064e3b/ffffff?text=GDG'">
+    <h1>Giornale Dei Gamer</h1>
+    <p>Le ultime notizie, recensioni e aggiornamenti dal mondo dei videogiochi.</p>
+    <div class="btn-group">
+      <a class="btn" href="https://discord.gg" target="_blank" rel="noopener">Entra nel Discord</a>
+      <a class="btn btn-secondary" href="articoli.html">Leggi gli articoli</a>
+      <a class="btn btn-secondary" href="community.html">Community</a>
+    </div>
+  </header>
+
+  <section class="glass">
+    <h2>Chi siamo</h2>
+    <p>Benvenuti su Giornale Dei Gamer! La testata indipendente fatta da videogiocatori per videogiocatori. Condividiamo notizie, guide e recensioni sul mondo del gaming.</p>
+  </section>
+
+  <section class="glass">
+    <h2>Dove ci trovi</h2>
+    <div class="grid">
+      <div class="card">
+        <h3>Discord</h3>
+        <p>Chatta con noi, partecipa alle dirette ed entra nel server community.</p>
+      </div>
+      <div class="card">
+        <h3>Social & Youtube</h3>
+        <p>Video recensioni, highlights e notizie in tempo reale sui nostri canali.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="glass">
+    <h2>Regole della Community</h2>
+    <ul>
+      <li>Rispetta tutti i membri e la redazione.</li>
+      <li>Niente spam o pubblicità non autorizzata.</li>
+      <li>Condividi la passione per il gaming senza tossicità!</li>
+    </ul>
+  </section>
+
+  <section class="glass">
+    <h2>Redazione & Staff</h2>
+    <p>Incontra il team di redattori e moderatori che cura i contenuti del sito.</p>
+    <div style="margin-top: 14px;">
+      <a class="btn btn-secondary" href="staff.html">Visualizza lo staff completo</a>
+    </div>
+  </section>
+
+  <footer>Giornale Dei Gamer · Tutti i diritti riservati</footer>
+
+</div>
+</body>
+</html>
