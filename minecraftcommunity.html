@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Minecraft Community · Giornale Dei Gamer</title>
+<link rel="icon" href="logo2.jpg">
+<style>
+  * { box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; }
+  body {
+    margin: 0;
+    min-height: 100vh;
+    font-family: "Segoe UI", system-ui, -apple-system, Roboto, sans-serif;
+    color: #e0f2fe;
+    line-height: 1.6;
+    overflow-x: hidden;
+    background: url('img/sfondominecraft1.png') no-repeat center center fixed;
+    background-size: cover;
+    background-color: #0c4a6e; /* Colore di fallback se l'immagine non carica */
+  }
+
+  .wrap { 
+    width: 100%; 
+    max-width: 760px; 
+    margin: 0 auto; 
+    padding: 18px; 
+  }
+
+  /* Effetto Vetro / Glassmorphism */
+  .glass {
+    background: rgba(12, 74, 110, 0.65);
+    border: 1px solid rgba(125, 211, 252, 0.45);
+    border-radius: 16px;
+    box-shadow: 0 8px 28px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(224, 242, 254, 0.5);
+    -webkit-backdrop-filter: blur(12px);
+    backdrop-filter: blur(12px);
+    padding: 20px;
+    margin-bottom: 18px;
+  }
+
+  header.glass { 
+    margin-top: 24px; 
+    text-align: center; 
+    padding: 30px 20px; 
+  }
+
+  h1 {
+    margin: 0 0 10px;
+    font-size: clamp(1.8rem, 7vw, 2.8rem);
+    line-height: 1.1;
+    color: #ffffff;
+    text-shadow: 0 0 16px rgba(56, 189, 248, 0.9), 0 2px 4px rgba(0, 0, 0, 0.8);
+  }
+
+  header p { 
+    margin: 0; 
+    color: #bae6fd; 
+    font-size: 1.05rem; 
+  }
+
+  /* Box scorrevole per i post */
+  .scroll-box {
+    max-height: 450px;
+    overflow-y: auto;
+    padding-right: 6px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  /* Personalizzazione scrollbar */
+  .scroll-box::-webkit-scrollbar {
+    width: 8px;
+  }
+  .scroll-box::-webkit-scrollbar-track {
+    background: rgba(12, 74, 110, 0.3);
+    border-radius: 4px;
+  }
+  .scroll-box::-webkit-scrollbar-thumb {
+    background: rgba(125, 211, 252, 0.5);
+    border-radius: 4px;
+  }
+  .scroll-box::-webkit-scrollbar-thumb:hover {
+    background: rgba(125, 211, 252, 0.8);
+  }
+
+  /* Singolo Post */
+  .post-card {
+    background: rgba(7, 59, 92, 0.75);
+    border: 1px solid rgba(125, 211, 252, 0.3);
+    border-radius: 12px;
+    padding: 16px;
+  }
+
+  .post-card h3 {
+    margin: 0 0 8px;
+    font-size: 1.15rem;
+    color: #ffffff;
+  }
+
+  .post-card p {
+    margin: 0 0 14px;
+    color: #e0f2fe;
+    font-size: 0.95rem;
+  }
+
+  /* Pulsante Like */
+  .like-btn {
+    background: rgba(2, 132, 199, 0.5);
+    border: 1px solid #7dd3fc;
+    color: #ffffff;
+    padding: 6px 14px;
+    border-radius: 999px;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 0.9rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    transition: all 0.2s ease;
+    text-shadow: 0 1px 2px rgba(0, 20, 40, 0.8);
+  }
+
+  .like-btn:hover {
+    background: rgba(56, 189, 248, 0.7);
+    transform: translateY(-1px);
+  }
+
+  .like-btn:active {
+    transform: translateY(0);
+  }
+
+  /* Pulsante Indietro */
+  .back-container {
+    text-align: center;
+    margin-top: 10px;
+    margin-bottom: 20px;
+  }
+
+  .btn {
+    display: inline-block;
+    min-height: 42px;
+    padding: 10px 24px;
+    color: #ffffff;
+    font-weight: 600;
+    text-decoration: none;
+    text-shadow: 0 1px 2px rgba(0, 20, 40, 0.9);
+    border: 1px solid #7dd3fc;
+    border-radius: 999px;
+    background: linear-gradient(180deg, #38bdf8 0%, #0284c7 50%, #0369a1 51%, #0284c7 100%);
+    box-shadow: 0 0 12px rgba(56, 189, 248, 0.4);
+    transition: all 0.2s ease;
+  }
+
+  .btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 0 18px rgba(56, 189, 248, 0.7);
+  }
+
+  footer { 
+    text-align: center; 
+    color: #7dd3fc; 
+    font-size: .9rem; 
+    padding: 10px 0 30px; 
+    text-shadow: 0 1px 2px rgba(0,0,0,0.8);
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="glass">
+    <h1>Minecraft Community</h1>
+    <p>Condividi pensieri, idee e discussioni sul mondo dei cubi.</p>
+  </header>
+
+  <!-- Box semi-trasparente con scorrimento -->
+  <div class="glass">
+    <div class="scroll-box">
+      
+      <!-- Post 1 -->
+      <div class="post-card">
+        <h3>Preferisco le versioni alpha di minecraft</h3>
+        <p>Sono più nostalgiche e pulite. Ora sembrano un ammasso di codice e texture superflue.</p>
+        <button class="like-btn" onclick="incrementLike(this)">
+          👍 <span class="like-count">23</span>
+        </button>
+      </div>
+
+      <!-- Puoi aggiungere altri post futuri qui dentro duplicando la struttura .post-card -->
+
+    </div>
+  </div>
+
+  <div class="back-container">
+    <a class="btn" href="index.html">Torna alla Home</a>
+  </div>
+
+  <footer>Giornale Dei Gamer · Tutti i diritti riservati</footer>
+
+</div>
+
+<script>
+  function incrementLike(button) {
+    const countSpan = button.querySelector('.like-count');
+    let currentLikes = parseInt(countSpan.textContent, 10);
+    currentLikes++;
+    countSpan.textContent = currentLikes;
+    
+    // Piccolo feedback visivo al click
+    button.style.transform = 'scale(1.1)';
+    setTimeout(() => {
+      button.style.transform = 'scale(1)';
+    }, 150);
+  }
+</script>
+
+</body>
+</html>
