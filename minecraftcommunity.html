@@ -59,6 +59,34 @@
     font-size: 1.05rem; 
   }
 
+  /* Barra di ricerca */
+  .search-container {
+    margin-bottom: 16px;
+  }
+
+  .search-input {
+    width: 100%;
+    padding: 12px 18px;
+    border-radius: 999px;
+    border: 1px solid rgba(125, 211, 252, 0.5);
+    background: rgba(7, 59, 92, 0.8);
+    color: #ffffff;
+    font-size: 0.95rem;
+    outline: none;
+    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.4);
+    transition: all 0.2s ease;
+  }
+
+  .search-input::placeholder {
+    color: #7dd3fc;
+    opacity: 0.7;
+  }
+
+  .search-input:focus {
+    border-color: #38bdf8;
+    box-shadow: 0 0 12px rgba(56, 189, 248, 0.6), inset 0 2px 4px rgba(0, 0, 0, 0.4);
+  }
+
   /* Box scorrevole per i post */
   .scroll-box {
     max-height: 450px;
@@ -91,6 +119,7 @@
     border: 1px solid rgba(125, 211, 252, 0.3);
     border-radius: 12px;
     padding: 16px;
+    transition: all 0.2s ease;
   }
 
   .post-card h3 {
@@ -177,7 +206,13 @@
 
   <!-- Box semi-trasparente con scorrimento -->
   <div class="glass">
-    <div class="scroll-box">
+
+    <!-- Campo di ricerca dinamico -->
+    <div class="search-container">
+      <input type="text" id="searchInput" class="search-input" placeholder="🔍 Cerca nei post..." onkeyup="filterPosts()">
+    </div>
+
+    <div class="scroll-box" id="postsContainer">
       
       <!-- Post 1 -->
       <div class="post-card">
@@ -202,17 +237,35 @@
 </div>
 
 <script>
+  // Funzione per il contatore di Like
   function incrementLike(button) {
     const countSpan = button.querySelector('.like-count');
     let currentLikes = parseInt(countSpan.textContent, 10);
     currentLikes++;
     countSpan.textContent = currentLikes;
     
-    // Piccolo feedback visivo al click
     button.style.transform = 'scale(1.1)';
     setTimeout(() => {
       button.style.transform = 'scale(1)';
     }, 150);
+  }
+
+  // Funzione per la ricerca in tempo reale
+  function filterPosts() {
+    const query = document.getElementById('searchInput').value.toLowerCase();
+    const posts = document.querySelectorAll('.post-card');
+
+    posts.forEach(post => {
+      const title = post.querySelector('h3').textContent.toLowerCase();
+      const content = post.querySelector('p').textContent.toLowerCase();
+
+      // Se la ricerca compare nel titolo o nel testo, mostra il post, altrimenti nascondilo
+      if (title.includes(query) || content.includes(query)) {
+        post.style.display = 'block';
+      } else {
+        post.style.display = 'none';
+      }
+    });
   }
 </script>
 
