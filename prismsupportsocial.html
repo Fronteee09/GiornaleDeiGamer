@@ -244,7 +244,7 @@
   function generateBotResponse(input) {
     const lower = input.toLowerCase();
 
-    // Riconoscimento parolacce / insulti / provocazioni
+    // 1. Riconoscimento parolacce / insulti / provocazioni
     const badWords = ['coglione', 'stronzo', 'merda', 'idiota', 'deficiente', 'bastardo', 'cazzo', 'pirla', 'vaffanculo', 'schifo'];
     if (badWords.some(word => lower.includes(word))) {
       const educationalResponses = [
@@ -258,13 +258,9 @@
       return educationalResponses[Math.floor(Math.random() * educationalResponses.length)];
     }
 
-    // Richiesta di aiuto
-    if (lower.includes('aiuto') || lower.includes('help') || lower.includes('supporto')) {
-      return "Ti consiglio di visitare la sezione aiuto oppure di digitare parole chiave come 'Sito', 'utente', 'commenti' o 'post' per trovare indicazioni.";
-    }
-
-    // Saluto "Ciao" (5 risposte casuali, serie, senza emoji)
-    if (lower === 'ciao' || lower === 'salve' || lower === 'buongiorno') {
+    // 2. Saluti e Cortesie (Numerosi match)
+    const greetings = ['ciao', 'salve', 'buongiorno', 'buonasera', 'buondì', 'ehi', 'hola', 'hey', 'reep'];
+    if (greetings.some(g => lower === g || lower.startsWith(g + ' ') || lower.endsWith(' ' + g))) {
       const ciaoResponses = [
         "Salve. Sono il sistema di supporto automatizzato di WindPrism, pronto a verificare le richieste.",
         "Buongiorno. La ascolto, descriva pure la natura della sua richiesta o del problema riscontrato.",
@@ -275,26 +271,50 @@
       return ciaoResponses[Math.floor(Math.random() * ciaoResponses.length)];
     }
 
-    // Domande complesse o troppo ampie
+    // 3. Domande sullo stato del bot ("come va", "come stai")
+    if (lower.includes('come va') || lower.includes('come stai') || lower.includes('tutto bene')) {
+      const statusResponses = [
+        "Tutto funziona regolarmente. I sistemi sono stabili e operativi.",
+        "Nessun problema rilevato nei moduli di sistema. Grazie per averlo chiesto.",
+        "Operativo al massimo delle capacità attuali. Dimmi pure come posso aiutarti.",
+        "I server sono attivi e pronti ad elaborare le richieste."
+      ];
+      return statusResponses[Math.floor(Math.random() * statusResponses.length)];
+    }
+
+    // 4. Domande sull'identità ("chi sei", "cosa sei")
+    if (lower.includes('chi sei') || lower.includes('cosa sei') || lower.includes('tuo nome')) {
+      return "Sono PrismSupport, l'assistente virtuale ufficiale del gruppo WindPrism e dello Staff di Giornale Dei Gamer.";
+    }
+
+    // 5. Richieste di aiuto
+    if (lower.includes('aiuto') || lower.includes('help') || lower.includes('supporto') || lower.includes('assistenza')) {
+      return "Ti consiglio di digitare parole chiave come 'Sito', 'utente', 'commenti' o 'post' per ricevere informazioni specifiche su come muoverti.";
+    }
+
+    // 6. Parole chiave tematiche
+    if (lower.includes('sito')) {
+      return "Il sito principale è Giornale Dei Gamer, una piattaforma dedicata a notizie, sondaggi e discussioni sulla community gaming.";
+    }
+    if (lower.includes('utente')) {
+      return "Tutti gli utenti sono invitati a mantenere un comportamento rispettoso sia nel sito che nei canali social.";
+    }
+    if (lower.includes('commenti')) {
+      return "I commenti e i post vengono moderati per prevenire atteggiamenti spiacevoli e garantire la massima trasparenza.";
+    }
+    if (lower.includes('post')) {
+      return "Puoi esplorare e interagire con i post nella sezione Community, come ad esempio la pagina dedicata a Minecraft.";
+    }
+    if (lower.includes('grazie') || lower.includes('perfect') || lower.includes('ok')) {
+      return "Prego. Se hai altre domande relative alle sezioni del sito, sono a tua disposizione.";
+    }
+
+    // 7. Frasi complesse o troppo lunghe
     if (lower.length > 60 || lower.includes('filosofia') || lower.includes('universo') || lower.includes('spiega tutto') || lower.includes('intelligenza artificiale')) {
       return "Sono una forma base e non sono così potente da poter sostenere qualsiasi conversazione complessa.";
     }
 
-    // Parole chiave specifiche
-    if (lower.includes('sito')) {
-      return "Il sito principale è il Giornale Dei Gamer, strutturato con sezioni di notizie, community e staff.";
-    }
-    if (lower.includes('utente')) {
-      return "Ogni utente registrato o visitatore è tenuto a rispettare le linee guida e le regole della community.";
-    }
-    if (lower.includes('commenti')) {
-      return "La gestione dei commenti e dei post serve a mantenere un ambiente ordinato e privo di contenuti tossici.";
-    }
-    if (lower.includes('post')) {
-      return "I post delle community (come Minecraft o WindPrism) raccolgono discussioni e pareri dei partecipanti.";
-    }
-
-    // Risposte casuali generiche
+    // 8. Risposte casuali per contesti vari o non inerenti
     const generalResponses = [
       "Non ho riscontrato dati sufficienti nel mio sistema per elaborare questa specifica richiesta.",
       "Comprendo il punto, tuttavia al momento non ci sono aggiornamenti rilevanti su questo argomento.",
