@@ -85,6 +85,7 @@
     display: flex;
     flex-direction: column;
     align-items: center;
+    justify-content: space-between;
     transition: transform 0.2s ease, box-shadow 0.2s ease;
   }
 
@@ -111,12 +112,33 @@
   }
 
   .staff-role { 
-    margin: 0; 
+    margin: 0 0 12px; 
     color: #38bdf8; 
     font-weight: 600;
     font-size: 0.95rem;
     text-transform: uppercase;
     letter-spacing: 0.5px;
+  }
+
+  /* Bottoni dello Staff e del Navigatore */
+  .btn-small {
+    display: inline-block;
+    padding: 8px 18px;
+    color: #ffffff;
+    font-weight: 600;
+    font-size: 0.85rem;
+    text-decoration: none;
+    text-shadow: 0 1px 2px rgba(0, 20, 40, 0.9);
+    border: 1px solid #7dd3fc;
+    border-radius: 999px;
+    background: linear-gradient(180deg, #38bdf8 0%, #0284c7 50%, #0369a1 51%, #0284c7 100%);
+    box-shadow: 0 0 10px rgba(56, 189, 248, 0.3);
+    transition: all 0.2s ease;
+  }
+
+  .btn-small:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 0 14px rgba(56, 189, 248, 0.6);
   }
 
   .back-container {
@@ -167,16 +189,30 @@
       
       <!-- Fronte ★ -->
       <div class="staff-card">
-        <img class="staff-img" src="fronte.png" alt="Fronte ★" onerror="this.src='https://via.placeholder.com/110/0c4a6e/ffffff?text=Fronte'">
-        <h3>Fronte ★</h3>
-        <p class="staff-role">DEV</p>
+        <div>
+          <img class="staff-img" src="fronte.png" alt="Fronte ★" onerror="this.src='https://via.placeholder.com/110/0c4a6e/ffffff?text=Fronte'">
+          <h3>Fronte ★</h3>
+          <p class="staff-role">DEV</p>
+        </div>
       </div>
 
       <!-- Kukilol13 -->
       <div class="staff-card">
-        <img class="staff-img" src="kukilol13.png" alt="Kukilol13" onerror="this.src='https://via.placeholder.com/110/0c4a6e/ffffff?text=Kukilol13'">
-        <h3>Kukilol13</h3>
-        <p class="staff-role">Owner</p>
+        <div>
+          <img class="staff-img" src="kukilol13.png" alt="Kukilol13" onerror="this.src='https://via.placeholder.com/110/0c4a6e/ffffff?text=Kukilol13'">
+          <h3>Kukilol13</h3>
+          <p class="staff-role">Owner</p>
+        </div>
+      </div>
+
+      <!-- PrismSupport -->
+      <div class="staff-card">
+        <div>
+          <img class="staff-img" src="prismsupport.png" alt="PrismSupport" onerror="this.src='https://via.placeholder.com/110/0c4a6e/ffffff?text=Prism'">
+          <h3>PrismSupport</h3>
+          <p class="staff-role">Support</p>
+        </div>
+        <a class="btn-small" href="prismsupportsocial.html">Visualizza profilo</a>
       </div>
 
     </div>
