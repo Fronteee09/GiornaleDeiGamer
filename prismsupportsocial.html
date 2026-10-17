@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>PrismSupport Social · Giornale Dei Gamer</title>
+<link rel="icon" href="logo2.jpg">
+<style>
+  * { box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; }
+  body {
+    margin: 0;
+    min-height: 100vh;
+    font-family: "Segoe UI", system-ui, -apple-system, Roboto, sans-serif;
+    color: #e0f2fe;
+    line-height: 1.6;
+    overflow-x: hidden;
+    background:
+      radial-gradient(circle at 15% 8%, rgba(52, 211, 153, 0.35), transparent 38%),
+      radial-gradient(circle at 90% 35%, rgba(16, 185, 129, 0.35), transparent 42%),
+      radial-gradient(circle at 50% 85%, rgba(5, 150, 105, 0.25), transparent 50%),
+      linear-gradient(160deg, #022c22 0%, #064e3b 50%, #022018 100%);
+    background-attachment: fixed;
+  }
+
+  .wrap { 
+    width: 100%; 
+    max-width: 760px; 
+    margin: 0 auto; 
+    padding: 18px; 
+  }
+
+  /* Effetto Vetro Emerald */
+  .glass {
+    background: linear-gradient(180deg, rgba(167, 243, 208, 0.22), rgba(6, 78, 59, 0.45));
+    border: 1px solid rgba(110, 231, 183, 0.45);
+    border-radius: 16px;
+    box-shadow: 0 8px 28px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(209, 250, 229, 0.5);
+    -webkit-backdrop-filter: blur(12px);
+    backdrop-filter: blur(12px);
+    padding: 20px;
+    margin-bottom: 18px;
+  }
+
+  header.glass { 
+    margin-top: 24px; 
+    text-align: center; 
+    padding: 30px 20px; 
+  }
+
+  .profile-img {
+    width: 100px;
+    height: 100px;
+    object-fit: cover;
+    border-radius: 50%;
+    border: 2px solid rgba(110, 231, 183, 0.8);
+    box-shadow: 0 0 16px rgba(52, 211, 153, 0.6);
+    margin-bottom: 12px;
+    background-color: #064e3b;
+  }
+
+  h1 {
+    margin: 0 0 6px;
+    font-size: clamp(1.8rem, 7vw, 2.8rem);
+    color: #ffffff;
+    text-shadow: 0 0 16px rgba(52, 211, 153, 0.9);
+  }
+
+  header p { 
+    margin: 0; 
+    color: #a7f3d0; 
+    font-size: 1.05rem; 
+  }
+
+  /* Chat Box */
+  .chat-box {
+    height: 320px;
+    background: rgba(2, 44, 34, 0.6);
+    border: 1px solid rgba(110, 231, 183, 0.3);
+    border-radius: 12px;
+    padding: 16px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-bottom: 16px;
+  }
+
+  .message {
+    max-width: 80%;
+    padding: 10px 14px;
+    border-radius: 12px;
+    font-size: 0.95rem;
+    line-height: 1.4;
+  }
+
+  .message.bot {
+    background: rgba(6, 78, 59, 0.8);
+    border: 1px solid rgba(110, 231, 183, 0.3);
+    color: #e0f2fe;
+    align-self: flex-start;
+  }
+
+  .message.user {
+    background: rgba(16, 185, 129, 0.6);
+    border: 1px solid #34d399;
+    color: #ffffff;
+    align-self: flex-end;
+  }
+
+  /* Input e Pulsante Chat */
+  .chat-input-area {
+    display: flex;
+    gap: 10px;
+  }
+
+  .chat-input {
+    flex: 1;
+    padding: 12px 18px;
+    border-radius: 999px;
+    border: 1px solid #ffffff;
+    background: #ffffff;
+    color: #0f172a;
+    font-size: 0.95rem;
+    outline: none;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+  }
+
+  .chat-input::placeholder {
+    color: #64748b;
+  }
+
+  .send-btn {
+    padding: 0 22px;
+    border-radius: 999px;
+    border: 1px solid #6ee7b7;
+    background: linear-gradient(180deg, #34d399 0%, #10b981 50%, #059669 51%, #10b981 100%);
+    color: #ffffff;
+    font-weight: 600;
+    cursor: pointer;
+    box-shadow: 0 0 10px rgba(52, 211, 153, 0.5);
+    transition: all 0.2s ease;
+  }
+
+  .send-btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 0 14px rgba(52, 211, 153, 0.8);
+  }
+
+  /* Pulsante Indietro */
+  .back-container {
+    text-align: center;
+    margin-top: 10px;
+    margin-bottom: 20px;
+  }
+
+  .btn {
+    display: inline-block;
+    min-height: 42px;
+    padding: 10px 24px;
+    color: #ffffff;
+    font-weight: 600;
+    text-decoration: none;
+    text-shadow: 0 1px 2px rgba(0, 40, 20, 0.9);
+    border: 1px solid #6ee7b7;
+    border-radius: 999px;
+    background: linear-gradient(180deg, #34d399 0%, #10b981 50%, #059669 51%, #10b981 100%);
+    box-shadow: 0 0 12px rgba(52, 211, 153, 0.4);
+    transition: all 0.2s ease;
+  }
+
+  .btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 0 18px rgba(52, 211, 153, 0.7);
+  }
+
+  footer { 
+    text-align: center; 
+    color: #6ee7b7; 
+    font-size: .9rem; 
+    padding: 10px 0 30px; 
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="glass">
+    <img class="profile-img" src="prismlogo.png" alt="PrismSupport" onerror="this.src='https://via.placeholder.com/100/064e3b/ffffff?text=Prism'">
+    <h1>PrismSupport</h1>
+    <p>Profilo ufficiale e Chat di Assistenza</p>
+  </header>
+
+  <section class="glass">
+    <h2>Chat con PrismSupport</h2>
+    <div class="chat-box" id="chatBox">
+      <div class="message bot">Ciao, sono PrismSupport. Come posso assisterti oggi? Scrivi pure qualcosa per iniziare.</div>
+    </div>
+    
+    <div class="chat-input-area">
+      <input type="text" id="userInput" class="chat-input" placeholder="Scrivi un messaggio..." onkeypress="handleKeyPress(event)">
+      <button class="send-btn" onclick="sendMessage()">Invia</button>
+    </div>
+  </section>
+
+  <div class="back-container">
+    <a class="btn" href="staff.html">Torna allo Staff</a>
+  </div>
+
+  <footer>Giornale Dei Gamer · Tutti i diritti riservati</footer>
+
+</div>
+
+<script>
+  function handleKeyPress(event) {
+    if (event.key === 'Enter') {
+      sendMessage();
+    }
+  }
+
+  function sendMessage() {
+    const inputField = document.getElementById('userInput');
+    const text = inputField.value.trim();
+    if (!text) return;
+
+    appendMessage(text, 'user');
+    inputField.value = '';
+
+    setTimeout(() => {
+      const reply = generateBotResponse(text);
+      appendMessage(reply, 'bot');
+    }, 400);
+  }
+
+  function appendMessage(text, sender) {
+    const chatBox = document.getElementById('chatBox');
+    const msgDiv = document.createElement('div');
+    msgDiv.className = `message ${sender}`;
+    msgDiv.textContent = text;
+    chatBox.appendChild(msgDiv);
+    chatBox.scrollTop = chatBox.scrollHeight;
+  }
+
+  function generateBotResponse(input) {
+    const lower = input.toLowerCase();
+
+    // Riconoscimento parolacce / provocazioni
+    const badWords = ['coglione', 'stronzo', 'merda', 'idiota', 'deficiente', 'bastardo', 'cazzo', 'pirla', 'vaffanculo'];
+    if (badWords.some(word => lower.includes(word))) {
+      const responses = [
+        "Coglione",
+        "Hai qualche problema? Se devi continuare così parla con altri chatbot ma non con me.",
+        "Tutto ok?",
+        "Hai qualche problema?"
+      ];
+      return responses[Math.floor(Math.random() * responses.length)];
+    }
+
+    // Richiesta di aiuto
+    if (lower.includes('aiuto') || lower.includes('help') || lower.includes('supporto')) {
+      return "Ti consiglio di visitare la sezione aiuto oppure di digitare parole chiave come 'Sito', 'utente', 'commenti' o 'post' per trovare indicazioni.";
+    }
+
+    // Saluto "Ciao" (5 risposte casuali, serie, senza emoji, lunghezza media)
+    if (lower === 'ciao' || lower === 'salve' || lower === 'buongiorno') {
+      const ciaoResponses = [
+        "Salve. Sono il sistema di supporto automatizzato di WindPrism, pronto a verificare le richieste.",
+        "Buongiorno. La ascolto, descriva pure la natura della sua richiesta o del problema riscontrato.",
+        "Salve a lei. Sono operativo e disponibile per fornire assistenza tecnica e informazioni generali.",
+        "Buongiorno. Mi dica pure come posso esserle utile all'interno delle nostre piattaforme.",
+        "Salve. Registro la sua presenza, proceda pure con la domanda o la segnalazione."
+      ];
+      return ciaoResponses[Math.floor(Math.random() * ciaoResponses.length)];
+    }
+
+    // Domande complesse o troppo ampie
+    if (lower.length > 60 || lower.includes('filosofia') || lower.includes('universo') || lower.includes('spiega tutto') || lower.includes('intelligenza artificiale')) {
+      return "Sono una forma base e non sono così potente da poter sostenere qualsiasi conversazione complessa.";
+    }
+
+    // Parole chiave specifiche richieste
+    if (lower.includes('sito')) {
+      return "Il sito principale è il Giornale Dei Gamer, strutturato con sezioni di notizie, community e staff.";
+    }
+    if (lower.includes('utente')) {
+      return "Ogni utente registrato o visitatore è tenuto a rispettare le linee guida e le regole della community.";
+    }
+    if (lower.includes('commenti')) {
+      return "La gestione dei commenti e dei post serve a mantenere un ambiente ordinato e privo di contenuti tossici.";
+    }
+    if (lower.includes('post')) {
+      return "I post delle community (come Minecraft o WindPrism) raccolgono discussioni e pareri dei partecipanti.";
+    }
+
+    // Risposte casuali per situazioni generiche / non inerenti
+    const generalResponses = [
+      "Non ho riscontrato dati sufficienti nel mio sistema per elaborare questa specifica richiesta.",
+      "Comprendo il punto, tuttavia al momento non ci sono aggiornamenti rilevanti su questo argomento.",
+      "Questa è una questione interessante, ma esula dai parametri operativi che gestisco direttamente.",
+      "Ricevuto. Se riguarda lo sviluppo o la programmazione, ti invito a consultare le risorse dedicate.",
+      "Non saprei cosa aggiungere a riguardo, preferisco concentrarmi sulla gestione tecnica del sistema.",
+      "Procedi pure con un'altra domanda se hai bisogno di assistenza tecnica specifica.",
+      "Questo argomento non fa parte dei miei archivi principali, prova a verificare altrove.",
+      "Registrato. Se ti serve aiuto con la programmazione o la sicurezza informatica, chiedi pure."
+    ];
+    return generalResponses[Math.floor(Math.random() * generalResponses.length)];
+  }
+</script>
+
+</body>
+</html>
