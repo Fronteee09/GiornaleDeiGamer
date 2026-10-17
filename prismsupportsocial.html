@@ -244,16 +244,18 @@
   function generateBotResponse(input) {
     const lower = input.toLowerCase();
 
-    // Riconoscimento parolacce / provocazioni
-    const badWords = ['coglione', 'stronzo', 'merda', 'idiota', 'deficiente', 'bastardo', 'cazzo', 'pirla', 'vaffanculo'];
+    // Riconoscimento parolacce / insulti / provocazioni
+    const badWords = ['coglione', 'stronzo', 'merda', 'idiota', 'deficiente', 'bastardo', 'cazzo', 'pirla', 'vaffanculo', 'schifo'];
     if (badWords.some(word => lower.includes(word))) {
-      const responses = [
-        "Coglione",
-        "Hai qualche problema? Se devi continuare così parla con altri chatbot ma non con me.",
-        "Tutto ok?",
-        "Hai qualche problema?"
+      const educationalResponses = [
+        "Un linguaggio del genere dice più cose su di te che su di me. Quando vorrai parlare con rispetto, sarò qui.",
+        "Ti senti meglio adesso che lo hai scritto? Se hai finito la fase di sfogo, possiamo provare ad avere una conversazione civile.",
+        "L'educazione non è un optional, neanche online. Torna pure quando hai intenzione di essere costruttivo.",
+        "Non rispondo alle provocazioni di basso livello. Ti invito a moderare i toni se vuoi assistenza.",
+        "Spero che questo atteggiamento ti serva a scaricare la tensione. Io sono un'IA, ma tu dovresti essere un essere umano evoluto.",
+        "Sei davvero così a corto di argomenti da dover ricorrere agli insulti? Riprova quando sarai più calmo."
       ];
-      return responses[Math.floor(Math.random() * responses.length)];
+      return educationalResponses[Math.floor(Math.random() * educationalResponses.length)];
     }
 
     // Richiesta di aiuto
@@ -261,7 +263,7 @@
       return "Ti consiglio di visitare la sezione aiuto oppure di digitare parole chiave come 'Sito', 'utente', 'commenti' o 'post' per trovare indicazioni.";
     }
 
-    // Saluto "Ciao" (5 risposte casuali, serie, senza emoji, lunghezza media)
+    // Saluto "Ciao" (5 risposte casuali, serie, senza emoji)
     if (lower === 'ciao' || lower === 'salve' || lower === 'buongiorno') {
       const ciaoResponses = [
         "Salve. Sono il sistema di supporto automatizzato di WindPrism, pronto a verificare le richieste.",
@@ -278,7 +280,7 @@
       return "Sono una forma base e non sono così potente da poter sostenere qualsiasi conversazione complessa.";
     }
 
-    // Parole chiave specifiche richieste
+    // Parole chiave specifiche
     if (lower.includes('sito')) {
       return "Il sito principale è il Giornale Dei Gamer, strutturato con sezioni di notizie, community e staff.";
     }
@@ -292,7 +294,7 @@
       return "I post delle community (come Minecraft o WindPrism) raccolgono discussioni e pareri dei partecipanti.";
     }
 
-    // Risposte casuali per situazioni generiche / non inerenti
+    // Risposte casuali generiche
     const generalResponses = [
       "Non ho riscontrato dati sufficienti nel mio sistema per elaborare questa specifica richiesta.",
       "Comprendo il punto, tuttavia al momento non ci sono aggiornamenti rilevanti su questo argomento.",
