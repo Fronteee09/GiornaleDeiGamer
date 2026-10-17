@@ -1,1 +1,139 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>WindPrism · Giornale Dei Gamer</title>
+<link rel="icon" href="logo2.jpg">
+<style>
+  * { box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; }
+  body {
+    margin: 0;
+    min-height: 100vh;
+    font-family: "Segoe UI", system-ui, -apple-system, Roboto, sans-serif;
+    color: #e0f2fe;
+    line-height: 1.6;
+    overflow-x: hidden;
+    background:
+      radial-gradient(circle at 15% 8%, rgba(52, 211, 153, 0.35), transparent 38%),
+      radial-gradient(circle at 90% 35%, rgba(16, 185, 129, 0.35), transparent 42%),
+      radial-gradient(circle at 50% 85%, rgba(5, 150, 105, 0.25), transparent 50%),
+      linear-gradient(160deg, #022c22 0%, #064e3b 50%, #022018 100%);
+    background-attachment: fixed;
+  }
 
+  .wrap { 
+    width: 100%; 
+    max-width: 760px; 
+    margin: 0 auto; 
+    padding: 18px; 
+  }
+
+  /* Effetto Vetro Aero / Glassmorphism Emerald */
+  .glass {
+    background: linear-gradient(180deg, rgba(167, 243, 208, 0.22), rgba(6, 78, 59, 0.45));
+    border: 1px solid rgba(110, 231, 183, 0.45);
+    border-radius: 16px;
+    box-shadow: 0 8px 28px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(209, 250, 229, 0.5);
+    -webkit-backdrop-filter: blur(12px);
+    backdrop-filter: blur(12px);
+    padding: 20px;
+    margin-bottom: 18px;
+  }
+
+  header.glass { 
+    margin-top: 24px; 
+    text-align: center; 
+    padding: 36px 20px; 
+  }
+
+  h1 {
+    margin: 0 0 10px;
+    font-size: clamp(2rem, 9vw, 3.4rem);
+    line-height: 1.1;
+    color: #ffffff;
+    text-shadow: 0 0 16px rgba(52, 211, 153, 0.9), 0 2px 4px rgba(0, 0, 0, 0.8);
+  }
+
+  header p { 
+    margin: 0; 
+    color: #a7f3d0; 
+    font-size: 1.1rem; 
+  }
+
+  h2 { 
+    margin: 0 0 12px; 
+    font-size: 1.35rem; 
+    color: #ffffff; 
+    text-shadow: 0 0 10px rgba(52, 211, 153, 0.6); 
+  }
+
+  p { 
+    margin: 0 0 14px; 
+    color: #a7f3d0; 
+    font-size: 1.05rem;
+  }
+
+  .back-container {
+    text-align: center;
+    margin-top: 20px;
+    margin-bottom: 20px;
+  }
+
+  /* Bottoni stile Windows Aero Verde */
+  .btn {
+    display: inline-block;
+    min-height: 42px;
+    padding: 10px 24px;
+    color: #ffffff;
+    font-weight: 600;
+    text-decoration: none;
+    text-shadow: 0 1px 2px rgba(0, 40, 20, 0.9);
+    border: 1px solid #6ee7b7;
+    border-radius: 999px;
+    background: linear-gradient(180deg, #34d399 0%, #10b981 50%, #059669 51%, #10b981 100%);
+    box-shadow: 0 0 16px rgba(52, 211, 153, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.7);
+    transition: all 0.2s ease;
+  }
+
+  .btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 0 22px rgba(52, 211, 153, 0.8), inset 0 1px 0 rgba(255, 255, 255, 0.9);
+  }
+
+  .btn:active { 
+    filter: brightness(.9); 
+    transform: translateY(0);
+  }
+
+  footer { 
+    text-align: center; 
+    color: #6ee7b7; 
+    font-size: .9rem; 
+    padding: 10px 0 30px; 
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="glass">
+    <h1>WindPrism</h1>
+    <p>Programmazione, sviluppo e assistenza risorse.</p>
+  </header>
+
+  <section class="glass">
+    <h2>Cos'è WindPrism?</h2>
+    <p>WindPrism è un progetto indipendente che si occupa di programmazione. Il sito è stato realizzato da un membro Prism e qui troverai le risorse adatte per essere assistito.</p>
+  </section>
+
+  <div class="back-container">
+    <a class="btn" href="visualizzacommunity.html">Torna alle Community</a>
+  </div>
+
+  <footer>Giornale Dei Gamer · Tutti i diritti riservati</footer>
+
+</div>
+</body>
+</html>
