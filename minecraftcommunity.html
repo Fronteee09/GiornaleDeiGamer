@@ -59,7 +59,7 @@
     font-size: 1.05rem; 
   }
 
-  /* Barra di ricerca */
+  /* Barra di ricerca bianca */
   .search-container {
     margin-bottom: 16px;
   }
@@ -68,23 +68,23 @@
     width: 100%;
     padding: 12px 18px;
     border-radius: 999px;
-    border: 1px solid rgba(125, 211, 252, 0.5);
-    background: rgba(7, 59, 92, 0.8);
-    color: #ffffff;
+    border: 1px solid #ffffff;
+    background: #ffffff;
+    color: #0f172a;
     font-size: 0.95rem;
     outline: none;
-    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.4);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
     transition: all 0.2s ease;
   }
 
   .search-input::placeholder {
-    color: #7dd3fc;
-    opacity: 0.7;
+    color: #64748b;
+    opacity: 1;
   }
 
   .search-input:focus {
     border-color: #38bdf8;
-    box-shadow: 0 0 12px rgba(56, 189, 248, 0.6), inset 0 2px 4px rgba(0, 0, 0, 0.4);
+    box-shadow: 0 0 14px rgba(56, 189, 248, 0.8);
   }
 
   /* Box scorrevole per i post */
@@ -207,7 +207,7 @@
   <!-- Box semi-trasparente con scorrimento -->
   <div class="glass">
 
-    <!-- Campo di ricerca dinamico -->
+    <!-- Campo di ricerca bianco -->
     <div class="search-container">
       <input type="text" id="searchInput" class="search-input" placeholder="🔍 Cerca nei post..." onkeyup="filterPosts()">
     </div>
@@ -222,8 +222,6 @@
           👍 <span class="like-count">23</span>
         </button>
       </div>
-
-      <!-- Puoi aggiungere altri post futuri qui dentro duplicando la struttura .post-card -->
 
     </div>
   </div>
@@ -259,7 +257,6 @@
       const title = post.querySelector('h3').textContent.toLowerCase();
       const content = post.querySelector('p').textContent.toLowerCase();
 
-      // Se la ricerca compare nel titolo o nel testo, mostra il post, altrimenti nascondilo
       if (title.includes(query) || content.includes(query)) {
         post.style.display = 'block';
       } else {
