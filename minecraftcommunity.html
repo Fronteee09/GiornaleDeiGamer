@@ -132,6 +132,7 @@
     border: 1px solid rgba(125, 211, 252, 0.3);
     border-radius: 12px;
     padding: 16px;
+    position: relative;
   }
 
   .post-author {
@@ -202,6 +203,7 @@
     border-radius: 4px;
     margin-bottom: 8px;
     font-size: 0.88rem;
+    position: relative;
   }
 
   .comment-author {
@@ -323,7 +325,7 @@
     return localStorage.getItem('gdg_logged_user');
   }
 
-  // Ascolto in tempo reale dei post su Firestore (senza orderBy per evitare blocchi di indici)
+  // Ascolto in tempo reale dei post su Firestore
   db.collection('posts').onSnapshot((snapshot) => {
     const container = document.getElementById('postsContainer');
     container.innerHTML = '';
@@ -332,6 +334,8 @@
       container.innerHTML = '<p style="text-align:center;">Nessun post presente. Creane uno tu!</p>';
       return;
     }
+
+    const loggedUser = getLoggedUser();
 
     snapshot.forEach((doc) => {
       const post = doc.data();
@@ -347,7 +351,14 @@
 
       const commentsCount = post.comments ? post.comments.length : 0;
 
+      // Mostra il tasto elimina post solo se sei l'autore o l'admin "Fronte"
+      let deletePostBtn = '';
+      if (loggedUser && (loggedUser === post.author || loggedUser.toLowerCase() === 'fronte')) {
+        deletePostBtn = `<button onclick="deletePost('${postId}')" style="background: rgba(239,68,68,0.6); border: 1px solid #fca5a5; color: white; padding: 4px 10px; border-radius: 6px; cursor: pointer; float: right; font-size: 0.8rem;">🗑️ Elimina Post</button>`;
+      }
+
       card.innerHTML = `
+        ${deletePostBtn}
         <div class="post-author">👤 ${post.author || 'Anonimo'}</div>
         <h3>${post.title}</h3>
         ${imageHtml}
@@ -365,7 +376,7 @@
         <!-- Sezione Commenti -->
         <div class="comments-section" id="comments-${postId}">
           <div id="commentList-${postId}">
-            ${renderComments(post.comments || [])}
+            ${renderComments(post.comments || [], postId, loggedUser)}
           </div>
           <div class="add-comment-box">
             <input type="text" id="inputComment-${postId}" placeholder="Scrivi un commento...">
@@ -378,17 +389,26 @@
     });
   });
 
-  // Renderizza la lista commenti
-  function renderComments(comments) {
+  // Renderizza la lista commenti con eventuale tasto elimina
+  function renderComments(comments, postId, loggedUser) {
     if (comments.length === 0) {
       return '<p style="font-size:0.8rem; color:#bae6fd; margin:4px 0;">Nessun commento ancora.</p>';
     }
-    return comments.map(c => `
-      <div class="comment-item">
-        <div class="comment-author">${c.author}</div>
-        <div>${c.text}</div>
-      </div>
-    `).join('');
+    
+    return comments.map((c, index) => {
+      let deleteCommentBtn = '';
+      if (loggedUser && (loggedUser === c.author || loggedUser.toLowerCase() === 'fronte')) {
+        deleteCommentBtn = `<button onclick="deleteComment('${postId}', ${index})" style="background: none; border: none; color: #fca5a5; cursor: pointer; font-size: 0.8rem; float: right;" title="Elimina commento">❌</button>`;
+      }
+
+      return `
+        <div class="comment-item">
+          ${deleteCommentBtn}
+          <div class="comment-author">${c.author}</div>
+          <div>${c.text}</div>
+        </div>
+      `;
+    }).join('');
   }
 
   // Pubblica un nuovo post
@@ -481,6 +501,37 @@
       }
     } catch (e) {
       console.error("Errore inserimento commento: ", e);
+    }
+  }
+
+  // Funzione per eliminare un intero post
+  async function deletePost(postId) {
+    if (!confirm("Sei sicuro di voler eliminare questo post?")) return;
+
+    try {
+      await db.collection('posts').doc(postId).delete();
+    } catch (e) {
+      console.error("Errore durante l'eliminazione del post:", e);
+      alert("Non è stato possibile eliminare il post.");
+    }
+  }
+
+  // Funzione per eliminare un singolo commento
+  async function deleteComment(postId, commentIndex) {
+    if (!confirm("Vuoi eliminare questo commento?")) return;
+
+    try {
+      const postRef = db.collection('posts').doc(postId);
+      const doc = await postRef.get();
+
+      if (doc.exists) {
+        let comments = doc.data().comments || [];
+        comments.splice(commentIndex, 1);
+        await postRef.update({ comments: comments });
+      }
+    } catch (e) {
+      console.error("Errore durante l'eliminazione del commento:", e);
+      alert("Impossibile eliminare il commento.");
     }
   }
 
