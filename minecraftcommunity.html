@@ -336,6 +336,8 @@
     }
 
     const loggedUser = getLoggedUser();
+    const likedPostsKey = loggedUser ? ('gdg_liked_posts_' + loggedUser) : '';
+    const likedPosts = loggedUser ? (JSON.parse(localStorage.getItem(likedPostsKey)) || []) : [];
 
     snapshot.forEach((doc) => {
       const post = doc.data();
@@ -350,6 +352,10 @@
       }
 
       const commentsCount = post.comments ? post.comments.length : 0;
+      const hasLiked = likedPosts.includes(postId);
+      const likeBtnStyle = hasLiked 
+        ? "background: rgba(56, 189, 248, 0.85); border-color: #ffffff;" 
+        : "background: rgba(2, 132, 199, 0.5);";
 
       // Mostra il tasto elimina post solo se sei l'autore o l'admin "Fronte"
       let deletePostBtn = '';
@@ -365,7 +371,7 @@
         <p>${post.content}</p>
 
         <div class="post-actions">
-          <button class="like-btn" onclick="addLike('${postId}', ${post.likes || 0})">
+          <button class="like-btn" style="${likeBtnStyle}" onclick="addLike('${postId}', ${post.likes || 0})">
             👍 <span>${post.likes || 0}</span>
           </button>
           <button class="comment-toggle-btn" onclick="toggleComments('${postId}')">
@@ -449,14 +455,35 @@
     }
   }
 
-  // Incrementa i Like su Firestore
+  // Sistema di Like intelligente (Metti / Togli Mi Piace)
   async function addLike(postId, currentLikes) {
+    const loggedUser = getLoggedUser();
+    if (!loggedUser) {
+      alert("Devi accedere con il tuo account per mettere un like!");
+      window.location.href = "account.html";
+      return;
+    }
+
+    const likedPostsKey = 'gdg_liked_posts_' + loggedUser;
+    let likedPosts = JSON.parse(localStorage.getItem(likedPostsKey)) || [];
+    const postRef = db.collection('posts').doc(postId);
+
     try {
-      await db.collection('posts').doc(postId).update({
-        likes: currentLikes + 1
-      });
+      if (likedPosts.includes(postId)) {
+        // Rimuovi il like (-1)
+        likedPosts = likedPosts.filter(id => id !== postId);
+        const newLikes = Math.max(0, currentLikes - 1);
+        await postRef.update({ likes: newLikes });
+      } else {
+        // Aggiungi il like (+1)
+        likedPosts.push(postId);
+        const newLikes = currentLikes + 1;
+        await postRef.update({ likes: newLikes });
+      }
+
+      localStorage.setItem(likedPostsKey, JSON.stringify(likedPosts));
     } catch (e) {
-      console.error("Errore Like: ", e);
+      console.error("Errore durante la gestione del like:", e);
     }
   }
 
