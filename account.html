@@ -39,11 +39,11 @@
     backdrop-filter: blur(12px);
     padding: 24px;
     margin-bottom: 18px;
+    text-align: center;
   }
 
   header.glass { 
     margin-top: 24px; 
-    text-align: center; 
     padding: 24px 20px; 
   }
 
@@ -70,7 +70,7 @@
     border: 1px solid #7dd3fc;
     background: rgba(255, 255, 255, 0.9);
     color: #0f172a;
-    font-size: 0.95ln;
+    font-size: 0.95rem;
     outline: none;
     box-shadow: 0 2px 8px rgba(0,0,0,0.2);
   }
@@ -78,6 +78,17 @@
   .input-field:focus {
     border-color: #ffffff;
     box-shadow: 0 0 12px rgba(56, 189, 248, 0.8);
+  }
+
+  .profile-img {
+    width: 100px;
+    height: 100px;
+    object-fit: cover;
+    border-radius: 50%;
+    border: 2px solid #7dd3fc;
+    box-shadow: 0 0 16px rgba(56, 189, 248, 0.6);
+    margin: 0 auto 14px;
+    background-color: #0c4a6e;
   }
 
   .btn {
@@ -101,7 +112,6 @@
   }
 
   .toggle-link {
-    text-align: center;
     margin-top: 14px;
     font-size: 0.9rem;
     color: #bae6fd;
@@ -109,9 +119,7 @@
     text-decoration: underline;
   }
 
-  .toggle-link:hover {
-    color: #ffffff;
-  }
+  .toggle-link:hover { color: #ffffff; }
 
   .back-container {
     text-align: center;
@@ -133,7 +141,6 @@
   .error-msg {
     color: #fca5a5;
     font-size: 0.85rem;
-    text-align: center;
     margin-top: 8px;
   }
 
@@ -144,12 +151,6 @@
     padding: 10px 0 30px; 
   }
 </style>
-
-<!-- Firebase SDKs Compat -->
-<script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-auth-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore-compat.js"></script>
-
 </head>
 <body>
 <div class="wrap">
@@ -159,7 +160,7 @@
     <p id="formSubtitle">Inserisci le tue credenziali per entrare</p>
   </header>
 
-  <!-- Sezione Form (Login / Registrazione) -->
+  <!-- Form Login / Registrazione -->
   <div class="glass" id="authBox">
     <div class="form-group">
       <input type="text" id="usernameInput" class="input-field" placeholder="Nome utente (Nickname)" required>
@@ -170,11 +171,30 @@
     <div class="toggle-link" id="toggleModeBtn" onclick="toggleMode()">Non hai un account? Registrati</div>
   </div>
 
-  <!-- Sezione Profilo (Visibile solo se loggati) -->
+  <!-- Profilo Utente / Pannello Admin -->
   <div class="glass" id="profileBox" style="display: none;">
+    <img id="userImgDisplay" class="profile-img" src="logo2.jpg" alt="Immagine profilo">
     <h2>Benvenuto, <span id="userNicknameDisplay"></span>!</h2>
-    <p style="margin-top: 6px; margin-bottom: 16px;">Sei correttamente autenticato nel sistema.</p>
-    <button class="btn" onclick="logoutUser()" style="background: linear-gradient(180deg, #ef4444 0%, #b91c1c 100%); border-color: #fca5a5;">Esci dall'account</button>
+    <p style="margin-top: 4px; margin-bottom: 16px;">Sei connesso al tuo account locale.</p>
+    
+    <div class="form-group">
+      <input type="text" id="newImgUrl" class="input-field" placeholder="Incolla il tuo nuovo URL immagine...">
+      <button class="btn" onclick="updateProfileImage()">Aggiorna la mia immagine</button>
+    </div>
+
+    <!-- PANNELLO ADMIN (Visibile solo se ti logghi come "Fronte") -->
+    <div id="adminPanel" style="display: none; margin-top: 24px; padding-top: 16px; border-top: 1px solid rgba(125, 211, 252, 0.4);">
+      <h3 style="color: #ffffff; margin-bottom: 10px; font-size: 1.1rem; text-shadow: 0 0 10px rgba(56,189,248,0.6);">🛠️ Console Admin (Gestione Utenti)</h3>
+      <div class="form-group">
+        <input type="text" id="adminTargetUser" class="input-field" placeholder="Nome utente da modificare...">
+        <input type="text" id="adminTargetImg" class="input-field" placeholder="Nuovo URL immagine per quell'utente...">
+        <button class="btn" onclick="adminUpdateUserImage()" style="background: linear-gradient(180deg, #f59e0b 0%, #d97706 100%); border-color: #fcd34d;">Forza Modifica Immagine Utente</button>
+      </div>
+    </div>
+
+    <div class="form-group" style="margin-top: 16px;">
+      <button class="btn" onclick="logoutUser()" style="background: linear-gradient(180deg, #ef4444 0%, #b91c1c 100%); border-color: #fca5a5;">Esci dall'account</button>
+    </div>
   </div>
 
   <div class="back-container">
@@ -186,24 +206,37 @@
 </div>
 
 <script>
-  // Configurazione Firebase (la stessa identica del tuo progetto)
-  const firebaseConfig = {
-    apiKey: "AIzaSyDSv5h11knmaS2CaJFTpgN6lTxEYptksRk",
-    authDomain: "giornaledeigamer---social.firebaseapp.com",
-    projectId: "giornaledeigamer---social",
-    storageBucket: "giornaledeigamer---social.firebasestorage.app",
-    messagingSenderId: "490970879261",
-    appId: "1:490970879261:web:00bb9ace1800dd8dbe7df4",
-    measurementId: "G-4K0NXCRDRL"
-  };
-
-  firebase.initializeApp(firebaseConfig);
-  const auth = firebase.auth();
-  const db = firebase.firestore();
-
   let isRegistering = false;
 
-  // Funzione per alternare tra Login e Registrazione
+  function checkLoginState() {
+    const loggedUser = localStorage.getItem('gdg_logged_user');
+    const authBox = document.getElementById('authBox');
+    const profileBox = document.getElementById('profileBox');
+    const adminPanel = document.getElementById('adminPanel');
+
+    if (loggedUser) {
+      authBox.style.display = 'none';
+      profileBox.style.display = 'block';
+
+      const userData = JSON.parse(localStorage.getItem('gdg_user_' + loggedUser));
+      document.getElementById('userNicknameDisplay').textContent = loggedUser;
+      
+      if (userData && userData.profileImg) {
+        document.getElementById('userImgDisplay').src = userData.profileImg;
+      }
+
+      // Mostra la console admin se l'utente loggato è "Fronte"
+      if (loggedUser.toLowerCase() === 'fronte') {
+        adminPanel.style.display = 'block';
+      } else {
+        adminPanel.style.display = 'none';
+      }
+    } else {
+      authBox.style.display = 'block';
+      profileBox.style.display = 'none';
+    }
+  }
+
   function toggleMode() {
     isRegistering = !isRegistering;
     const title = document.getElementById('formTitle');
@@ -225,8 +258,7 @@
     }
   }
 
-  // Gestione di Accesso o Registrazione
-  async function handleAuth() {
+  function handleAuth() {
     const username = document.getElementById('usernameInput').value.trim();
     const password = document.getElementById('passwordInput').value.trim();
     const errorBox = document.getElementById('errorMsg');
@@ -237,69 +269,95 @@
       return;
     }
 
-    // Trasformiamo il nickname in una finta email univoca per Firebase Auth
-    const pseudoEmail = `${username.toLowerCase().replace(/\s+/g, '_')}@giornaledeigamer.local`;
+    const userKey = 'gdg_user_' + username;
 
-    try {
-      if (isRegistering) {
-        // Registrazione
-        const userCredential = await auth.createUserWithEmailAndPassword(pseudoEmail, password);
-        const user = userCredential.user;
-
-        // Salviamo il nickname associato all'UID nel database Firestore
-        await db.collection('users').doc(user.uid).set({
-          nickname: username,
-          createdAt: firebase.firestore.FieldValue.serverTimestamp()
-        });
-
-        alert("Registrazione completata con successo!");
-      } else {
-        // Login
-        await auth.signInWithEmailAndPassword(pseudoEmail, password);
+    if (isRegistering) {
+      if (localStorage.getItem(userKey)) {
+        errorBox.textContent = "Questo nome utente esiste già!";
+        return;
       }
-    } catch (error) {
-      console.error(error);
-      if (error.code === 'auth/email-already-in-use') {
-        errorBox.textContent = "Questo nome utente è già in uso.";
-      } else if (error.code === 'auth/wrong-password' || error.code === 'auth/user-not-found' || error.code === 'auth/invalid-credential') {
-        errorBox.textContent = "Nome utente o password errati.";
-      } else {
-        errorBox.textContent = "Errore: " + error.message;
-      }
-    }
-  }
 
-  // Monitora lo stato dell'autenticazione in tempo reale
-  auth.onAuthStateChanged(async (user) => {
-    const authBox = document.getElementById('authBox');
-    const profileBox = document.getElementById('profileBox');
-    
-    if (user) {
-      // Utente loggato: recuperiamo il nickname da Firestore
-      authBox.style.display = 'none';
-      profileBox.style.display = 'block';
-
-      try {
-        const doc = await db.collection('users').doc(user.uid).get();
-        if (doc.exists) {
-          document.getElementById('userNicknameDisplay').textContent = doc.data().nickname;
-        } else {
-          document.getElementById('userNicknameDisplay').textContent = user.email.split('@')[0];
-        }
-      } catch (e) {
-        document.getElementById('userNicknameDisplay').textContent = "Utente";
-      }
+      const newUser = {
+        password: password,
+        profileImg: "logo2.jpg" // Immagine predefinita (favicon)
+      };
+      localStorage.setItem(userKey, JSON.stringify(newUser));
+      localStorage.setItem('gdg_logged_user', username);
+      alert("Registrazione completata con successo!");
     } else {
-      // Utente non loggato
-      authBox.style.display = 'block';
-      profileBox.style.display = 'none';
-    }
-  });
+      const storedData = localStorage.getItem(userKey);
+      if (!storedData) {
+        errorBox.textContent = "Utente non trovato.";
+        return;
+      }
 
-  // Funzione di Logout
-  function logoutUser() {
-    auth.signOut();
+      const userData = JSON.parse(storedData);
+      if (userData.password !== password) {
+        errorBox.textContent = "Password errata.";
+        return;
+      }
+
+      localStorage.setItem('gdg_logged_user', username);
+    }
+
+    document.getElementById('usernameInput').value = '';
+    document.getElementById('passwordInput').value = '';
+    checkLoginState();
   }
+
+  function updateProfileImage() {
+    const newUrl = document.getElementById('newImgUrl').value.trim();
+    if (!newUrl) {
+      alert("Inserisci un URL valido!");
+      return;
+    }
+
+    const loggedUser = localStorage.getItem('gdg_logged_user');
+    if (loggedUser) {
+      const userKey = 'gdg_user_' + loggedUser;
+      let userData = JSON.parse(localStorage.getItem(userKey));
+      userData.profileImg = newUrl;
+      localStorage.setItem(userKey, JSON.stringify(userData));
+
+      document.getElementById('userImgDisplay').src = newUrl;
+      document.getElementById('newImgUrl').value = '';
+      alert("Immagine profilo aggiornata!");
+    }
+  }
+
+  // Console Admin: Forza modifica immagine per qualsiasi utente
+  function adminUpdateUserImage() {
+    const targetUser = document.getElementById('adminTargetUser').value.trim();
+    const newImg = document.getElementById('adminTargetImg').value.trim();
+
+    if (!targetUser || !newImg) {
+      alert("Inserisci sia il nome utente che il nuovo URL dell'immagine!");
+      return;
+    }
+
+    const userKey = 'gdg_user_' + targetUser;
+    const storedData = localStorage.getItem(userKey);
+
+    if (!storedData) {
+      alert("L'utente '" + targetUser + "' non esiste nel database locale!");
+      return;
+    }
+
+    let userData = JSON.parse(storedData);
+    userData.profileImg = newImg;
+    localStorage.setItem(userKey, JSON.stringify(userData));
+
+    document.getElementById('adminTargetUser').value = '';
+    document.getElementById('adminTargetImg').value = '';
+    alert("Successo! L'immagine del profilo di '" + targetUser + "' è stata modificata dalla console admin.");
+  }
+
+  function logoutUser() {
+    localStorage.removeItem('gdg_logged_user');
+    checkLoginState();
+  }
+
+  window.onload = checkLoginState;
 </script>
 
 </body>
