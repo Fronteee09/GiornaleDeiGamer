@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Account · Giornale Dei Gamer</title>
+<link rel="icon" href="logo2.jpg">
+<style>
+  * { box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; }
+  body {
+    margin: 0;
+    min-height: 100vh;
+    font-family: "Segoe UI", system-ui, -apple-system, Roboto, sans-serif;
+    color: #e0f2fe;
+    line-height: 1.6;
+    overflow-x: hidden;
+    background:
+      radial-gradient(circle at 15% 8%, rgba(56, 189, 248, 0.35), transparent 38%),
+      radial-gradient(circle at 90% 35%, rgba(14, 165, 233, 0.35), transparent 42%),
+      radial-gradient(circle at 50% 85%, rgba(3, 105, 161, 0.25), transparent 50%),
+      linear-gradient(160deg, #0284c7 0%, #0369a1 50%, #075985 100%);
+    background-attachment: fixed;
+  }
+
+  .wrap { 
+    width: 100%; 
+    max-width: 500px; 
+    margin: 0 auto; 
+    padding: 18px; 
+  }
+
+  .glass {
+    background: linear-gradient(180deg, rgba(186, 230, 253, 0.22), rgba(12, 74, 110, 0.45));
+    border: 1px solid rgba(125, 211, 252, 0.45);
+    border-radius: 16px;
+    box-shadow: 0 8px 28px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(224, 242, 254, 0.5);
+    -webkit-backdrop-filter: blur(12px);
+    backdrop-filter: blur(12px);
+    padding: 24px;
+    margin-bottom: 18px;
+  }
+
+  header.glass { 
+    margin-top: 24px; 
+    text-align: center; 
+    padding: 24px 20px; 
+  }
+
+  h1 {
+    margin: 0 0 6px;
+    font-size: clamp(1.8rem, 7vw, 2.4rem);
+    color: #ffffff;
+    text-shadow: 0 0 16px rgba(56, 189, 248, 0.9);
+  }
+
+  p { margin: 0; color: #bae6fd; font-size: 0.95rem; }
+
+  .form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    margin-top: 16px;
+  }
+
+  .input-field {
+    width: 100%;
+    padding: 12px 16px;
+    border-radius: 999px;
+    border: 1px solid #7dd3fc;
+    background: rgba(255, 255, 255, 0.9);
+    color: #0f172a;
+    font-size: 0.95ln;
+    outline: none;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+  }
+
+  .input-field:focus {
+    border-color: #ffffff;
+    box-shadow: 0 0 12px rgba(56, 189, 248, 0.8);
+  }
+
+  .btn {
+    width: 100%;
+    min-height: 44px;
+    padding: 10px 20px;
+    color: #ffffff;
+    font-weight: 600;
+    text-align: center;
+    border: 1px solid #7dd3fc;
+    border-radius: 999px;
+    background: linear-gradient(180deg, #38bdf8 0%, #0284c7 50%, #0369a1 51%, #0284c7 100%);
+    box-shadow: 0 0 12px rgba(56, 189, 248, 0.5);
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+
+  .btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 0 16px rgba(56, 189, 248, 0.8);
+  }
+
+  .toggle-link {
+    text-align: center;
+    margin-top: 14px;
+    font-size: 0.9rem;
+    color: #bae6fd;
+    cursor: pointer;
+    text-decoration: underline;
+  }
+
+  .toggle-link:hover {
+    color: #ffffff;
+  }
+
+  .back-container {
+    text-align: center;
+    margin-top: 10px;
+    margin-bottom: 20px;
+  }
+
+  .btn-back {
+    display: inline-block;
+    padding: 10px 24px;
+    color: #ffffff;
+    font-weight: 600;
+    text-decoration: none;
+    border: 1px solid rgba(125, 211, 252, 0.4);
+    border-radius: 999px;
+    background: rgba(12, 74, 110, 0.6);
+  }
+
+  .error-msg {
+    color: #fca5a5;
+    font-size: 0.85rem;
+    text-align: center;
+    margin-top: 8px;
+  }
+
+  footer { 
+    text-align: center; 
+    color: #7dd3fc; 
+    font-size: .9rem; 
+    padding: 10px 0 30px; 
+  }
+</style>
+
+<!-- Firebase SDKs Compat -->
+<script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore-compat.js"></script>
+
+</head>
+<body>
+<div class="wrap">
+
+  <header class="glass">
+    <h1 id="formTitle">Accedi</h1>
+    <p id="formSubtitle">Inserisci le tue credenziali per entrare</p>
+  </header>
+
+  <!-- Sezione Form (Login / Registrazione) -->
+  <div class="glass" id="authBox">
+    <div class="form-group">
+      <input type="text" id="usernameInput" class="input-field" placeholder="Nome utente (Nickname)" required>
+      <input type="password" id="passwordInput" class="input-field" placeholder="Password" required>
+      <button class="btn" id="actionBtn" onclick="handleAuth()">Accedi</button>
+    </div>
+    <div class="error-msg" id="errorMsg"></div>
+    <div class="toggle-link" id="toggleModeBtn" onclick="toggleMode()">Non hai un account? Registrati</div>
+  </div>
+
+  <!-- Sezione Profilo (Visibile solo se loggati) -->
+  <div class="glass" id="profileBox" style="display: none;">
+    <h2>Benvenuto, <span id="userNicknameDisplay"></span>!</h2>
+    <p style="margin-top: 6px; margin-bottom: 16px;">Sei correttamente autenticato nel sistema.</p>
+    <button class="btn" onclick="logoutUser()" style="background: linear-gradient(180deg, #ef4444 0%, #b91c1c 100%); border-color: #fca5a5;">Esci dall'account</button>
+  </div>
+
+  <div class="back-container">
+    <a class="btn-back" href="index.html">Torna alla Home</a>
+  </div>
+
+  <footer>Giornale Dei Gamer · Tutti i diritti riservati</footer>
+
+</div>
+
+<script>
+  // Configurazione Firebase (la stessa identica del tuo progetto)
+  const firebaseConfig = {
+    apiKey: "AIzaSyDSv5h11knmaS2CaJFTpgN6lTxEYptksRk",
+    authDomain: "giornaledeigamer---social.firebaseapp.com",
+    projectId: "giornaledeigamer---social",
+    storageBucket: "giornaledeigamer---social.firebasestorage.app",
+    messagingSenderId: "490970879261",
+    appId: "1:490970879261:web:00bb9ace1800dd8dbe7df4",
+    measurementId: "G-4K0NXCRDRL"
+  };
+
+  firebase.initializeApp(firebaseConfig);
+  const auth = firebase.auth();
+  const db = firebase.firestore();
+
+  let isRegistering = false;
+
+  // Funzione per alternare tra Login e Registrazione
+  function toggleMode() {
+    isRegistering = !isRegistering;
+    const title = document.getElementById('formTitle');
+    const subtitle = document.getElementById('formSubtitle');
+    const btn = document.getElementById('actionBtn');
+    const toggleLink = document.getElementById('toggleModeBtn');
+    document.getElementById('errorMsg').textContent = '';
+
+    if (isRegistering) {
+      title.textContent = "Registrati";
+      subtitle.textContent = "Crea un nuovo account con nickname e password";
+      btn.textContent = "Registrati";
+      toggleLink.textContent = "Hai già un account? Accedi";
+    } else {
+      title.textContent = "Accedi";
+      subtitle.textContent = "Inserisci le tue credenziali per entrare";
+      btn.textContent = "Accedi";
+      toggleLink.textContent = "Non hai un account? Registrati";
+    }
+  }
+
+  // Gestione di Accesso o Registrazione
+  async function handleAuth() {
+    const username = document.getElementById('usernameInput').value.trim();
+    const password = document.getElementById('passwordInput').value.trim();
+    const errorBox = document.getElementById('errorMsg');
+    errorBox.textContent = '';
+
+    if (!username || !password) {
+      errorBox.textContent = "Compila tutti i campi!";
+      return;
+    }
+
+    // Trasformiamo il nickname in una finta email univoca per Firebase Auth
+    const pseudoEmail = `${username.toLowerCase().replace(/\s+/g, '_')}@giornaledeigamer.local`;
+
+    try {
+      if (isRegistering) {
+        // Registrazione
+        const userCredential = await auth.createUserWithEmailAndPassword(pseudoEmail, password);
+        const user = userCredential.user;
+
+        // Salviamo il nickname associato all'UID nel database Firestore
+        await db.collection('users').doc(user.uid).set({
+          nickname: username,
+          createdAt: firebase.firestore.FieldValue.serverTimestamp()
+        });
+
+        alert("Registrazione completata con successo!");
+      } else {
+        // Login
+        await auth.signInWithEmailAndPassword(pseudoEmail, password);
+      }
+    } catch (error) {
+      console.error(error);
+      if (error.code === 'auth/email-already-in-use') {
+        errorBox.textContent = "Questo nome utente è già in uso.";
+      } else if (error.code === 'auth/wrong-password' || error.code === 'auth/user-not-found' || error.code === 'auth/invalid-credential') {
+        errorBox.textContent = "Nome utente o password errati.";
+      } else {
+        errorBox.textContent = "Errore: " + error.message;
+      }
+    }
+  }
+
+  // Monitora lo stato dell'autenticazione in tempo reale
+  auth.onAuthStateChanged(async (user) => {
+    const authBox = document.getElementById('authBox');
+    const profileBox = document.getElementById('profileBox');
+    
+    if (user) {
+      // Utente loggato: recuperiamo il nickname da Firestore
+      authBox.style.display = 'none';
+      profileBox.style.display = 'block';
+
+      try {
+        const doc = await db.collection('users').doc(user.uid).get();
+        if (doc.exists) {
+          document.getElementById('userNicknameDisplay').textContent = doc.data().nickname;
+        } else {
+          document.getElementById('userNicknameDisplay').textContent = user.email.split('@')[0];
+        }
+      } catch (e) {
+        document.getElementById('userNicknameDisplay').textContent = "Utente";
+      }
+    } else {
+      // Utente non loggato
+      authBox.style.display = 'block';
+      profileBox.style.display = 'none';
+    }
+  });
+
+  // Funzione di Logout
+  function logoutUser() {
+    auth.signOut();
+  }
+</script>
+
+</body>
+</html>
