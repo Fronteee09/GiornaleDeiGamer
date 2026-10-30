@@ -323,8 +323,8 @@
     return localStorage.getItem('gdg_logged_user');
   }
 
-  // Ascolto in tempo reale dei post su Firestore
-  db.collection('posts').orderBy('timestamp', 'desc').onSnapshot((snapshot) => {
+  // Ascolto in tempo reale dei post su Firestore (senza orderBy per evitare blocchi di indici)
+  db.collection('posts').onSnapshot((snapshot) => {
     const container = document.getElementById('postsContainer');
     container.innerHTML = '';
 
