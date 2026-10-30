@@ -28,7 +28,7 @@
   }
 
   .glass {
-    background: rgba(12, 74, 110, 0.65);
+    background: rgba(12, 74, 110, 0.75);
     border: 1px solid rgba(125, 211, 252, 0.45);
     border-radius: 16px;
     box-shadow: 0 8px 28px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(224, 242, 254, 0.5);
@@ -72,8 +72,8 @@
     width: 100%;
     padding: 10px 14px;
     border-radius: 8px;
-    border: 1px solid #ffffff;
-    background: rgba(255, 255, 255, 0.9);
+    border: 1px solid #7dd3fc;
+    background: rgba(255, 255, 255, 0.95);
     color: #0f172a;
     font-size: 0.95rem;
     outline: none;
@@ -82,11 +82,6 @@
   textarea.input-field {
     resize: vertical;
     min-height: 70px;
-  }
-
-  .file-input {
-    color: #e0f2fe;
-    font-size: 0.9rem;
   }
 
   .submit-btn {
@@ -124,7 +119,7 @@
   }
 
   .scroll-box {
-    max-height: 450px;
+    max-height: 550px;
     overflow-y: auto;
     padding-right: 6px;
     display: flex;
@@ -133,10 +128,17 @@
   }
 
   .post-card {
-    background: rgba(7, 59, 92, 0.75);
+    background: rgba(7, 59, 92, 0.85);
     border: 1px solid rgba(125, 211, 252, 0.3);
     border-radius: 12px;
     padding: 16px;
+  }
+
+  .post-author {
+    font-size: 0.85rem;
+    color: #7dd3fc;
+    margin-bottom: 6px;
+    font-weight: bold;
   }
 
   .post-card h3 {
@@ -153,14 +155,21 @@
 
   .post-img {
     width: 100%;
-    max-height: 250px;
+    max-height: 280px;
     object-fit: cover;
     border-radius: 8px;
     margin-bottom: 12px;
     border: 1px solid rgba(125, 211, 252, 0.4);
   }
 
-  .like-btn {
+  .post-actions {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    margin-bottom: 12px;
+  }
+
+  .like-btn, .comment-toggle-btn {
     background: rgba(2, 132, 199, 0.5);
     border: 1px solid #7dd3fc;
     color: #ffffff;
@@ -168,10 +177,63 @@
     border-radius: 999px;
     cursor: pointer;
     font-weight: 600;
-    font-size: 0.9rem;
+    font-size: 0.85rem;
     display: inline-flex;
     align-items: center;
     gap: 6px;
+  }
+
+  .like-btn:hover, .comment-toggle-btn:hover {
+    background: rgba(2, 132, 199, 0.8);
+  }
+
+  /* Sezione Commenti */
+  .comments-section {
+    margin-top: 10px;
+    padding-top: 10px;
+    border-top: 1px solid rgba(125, 211, 252, 0.2);
+    display: none;
+  }
+
+  .comment-item {
+    background: rgba(12, 74, 110, 0.5);
+    border-left: 3px solid #7dd3fc;
+    padding: 8px 12px;
+    border-radius: 4px;
+    margin-bottom: 8px;
+    font-size: 0.88rem;
+  }
+
+  .comment-author {
+    font-weight: bold;
+    color: #bae6fd;
+    font-size: 0.8rem;
+  }
+
+  .add-comment-box {
+    display: flex;
+    gap: 8px;
+    margin-top: 10px;
+  }
+
+  .add-comment-box input {
+    flex: 1;
+    padding: 6px 12px;
+    border-radius: 999px;
+    border: 1px solid #7dd3fc;
+    outline: none;
+    font-size: 0.85rem;
+  }
+
+  .add-comment-box button {
+    padding: 6px 14px;
+    border-radius: 999px;
+    border: none;
+    background: #0284c7;
+    color: white;
+    cursor: pointer;
+    font-weight: bold;
+    font-size: 0.85rem;
   }
 
   .back-container {
@@ -199,10 +261,9 @@
   }
 </style>
 
-<!-- Firebase SDKs (Compat version per HTML) -->
+<!-- Firebase SDKs Compat per Firestore -->
 <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-storage-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore-compat.js"></script>
 
 </head>
 <body>
@@ -210,7 +271,7 @@
 
   <header class="glass">
     <h1>Minecraft Community</h1>
-    <p>Condividi pensieri, idee e immagini sul mondo dei cubi.</p>
+    <p>Condividi idee, costruzioni e commenti con gli altri gamer.</p>
   </header>
 
   <div class="glass">
@@ -219,7 +280,7 @@
     <div class="add-post-form">
       <input type="text" id="postTitle" class="input-field" placeholder="Titolo del post..." required>
       <textarea id="postContent" class="input-field" placeholder="Scrivi il tuo messaggio..." required></textarea>
-      <input type="file" id="postImage" class="file-input" accept="image/*">
+      <input type="text" id="postImageUrl" class="input-field" placeholder="URL Immagine (opzionale, es: https://...)">
       <button class="submit-btn" onclick="createNewPost()">Pubblica Post</button>
     </div>
 
@@ -230,7 +291,7 @@
 
     <!-- Lista post -->
     <div class="scroll-box" id="postsContainer">
-      <p style="text-align:center;">Caricamento post...</p>
+      <p style="text-align:center;">Caricamento post da Firestore...</p>
     </div>
   </div>
 
@@ -243,7 +304,7 @@
 </div>
 
 <script>
-  // La tua configurazione esatta di Firebase
+  // Configurazione Firebase del tuo progetto
   const firebaseConfig = {
     apiKey: "AIzaSyDSv5h11knmaS2CaJFTpgN6lTxEYptksRk",
     authDomain: "giornaledeigamer---social.firebaseapp.com",
@@ -251,87 +312,176 @@
     storageBucket: "giornaledeigamer---social.firebasestorage.app",
     messagingSenderId: "490970879261",
     appId: "1:490970879261:web:00bb9ace1800dd8dbe7df4",
-    measurementId: "G-4K0NXCRDRL",
-    databaseURL: "https://giornaledeigamer---social-default-rtdb.europe-west1.firebasedatabase.app" // Inserisci qui l'URL del tuo Realtime Database se lo crei
+    measurementId: "G-4K0NXCRDRL"
   };
 
   firebase.initializeApp(firebaseConfig);
-  const db = firebase.database();
-  const storage = firebase.storage();
+  const db = firebase.firestore();
 
-  // Caricamento in tempo reale dei post dal database
-  db.ref('posts').on('value', (snapshot) => {
+  // Recupera l'utente attualmente loggato da localStorage
+  function getLoggedUser() {
+    return localStorage.getItem('gdg_logged_user');
+  }
+
+  // Ascolto in tempo reale dei post su Firestore
+  db.collection('posts').orderBy('timestamp', 'desc').onSnapshot((snapshot) => {
     const container = document.getElementById('postsContainer');
     container.innerHTML = '';
 
-    const data = snapshot.val();
-    if (!data) {
+    if (snapshot.empty) {
       container.innerHTML = '<p style="text-align:center;">Nessun post presente. Creane uno tu!</p>';
       return;
     }
 
-    Object.keys(data).reverse().forEach(postId => {
-      const post = data[postId];
-      
+    snapshot.forEach((doc) => {
+      const post = doc.data();
+      const postId = doc.id;
+
       const card = document.createElement('div');
       card.className = 'post-card';
 
       let imageHtml = '';
       if (post.imageUrl) {
-        imageHtml = `<img class="post-img" src="${post.imageUrl}" alt="Immagine post">`;
+        imageHtml = `<img class="post-img" src="${post.imageUrl}" alt="Immagine post" onerror="this.style.display='none'">`;
       }
 
+      const commentsCount = post.comments ? post.comments.length : 0;
+
       card.innerHTML = `
+        <div class="post-author">👤 ${post.author || 'Anonimo'}</div>
         <h3>${post.title}</h3>
         ${imageHtml}
         <p>${post.content}</p>
-        <button class="like-btn" onclick="incrementLike('${postId}')">
-          👍 <span class="like-count">${post.likes || 0}</span>
-        </button>
+
+        <div class="post-actions">
+          <button class="like-btn" onclick="addLike('${postId}', ${post.likes || 0})">
+            👍 <span>${post.likes || 0}</span>
+          </button>
+          <button class="comment-toggle-btn" onclick="toggleComments('${postId}')">
+            💬 Commenti (<span>${commentsCount}</span>)
+          </button>
+        </div>
+
+        <!-- Sezione Commenti -->
+        <div class="comments-section" id="comments-${postId}">
+          <div id="commentList-${postId}">
+            ${renderComments(post.comments || [])}
+          </div>
+          <div class="add-comment-box">
+            <input type="text" id="inputComment-${postId}" placeholder="Scrivi un commento...">
+            <button onclick="addComment('${postId}')">Invia</button>
+          </div>
+        </div>
       `;
 
       container.appendChild(card);
     });
   });
 
-  // Funzione per pubblicare un post
-  async function createNewPost() {
-    const title = document.getElementById('postTitle').value.trim();
-    const content = document.getElementById('postContent').value.trim();
-    const imageFile = document.getElementById('postImage').files[0];
+  // Renderizza la lista commenti
+  function renderComments(comments) {
+    if (comments.length === 0) {
+      return '<p style="font-size:0.8rem; color:#bae6fd; margin:4px 0;">Nessun commento ancora.</p>';
+    }
+    return comments.map(c => `
+      <div class="comment-item">
+        <div class="comment-author">${c.author}</div>
+        <div>${c.text}</div>
+      </div>
+    `).join('');
+  }
 
-    if (!title || !content) {
-      alert("Compila titolo e testo!");
+  // Pubblica un nuovo post
+  async function createNewPost() {
+    const author = getLoggedUser();
+    if (!author) {
+      alert("Devi prima accedere con il tuo account dalla pagina Account per pubblicare un post!");
+      window.location.href = "account.html";
       return;
     }
 
-    let imageUrl = "";
+    const title = document.getElementById('postTitle').value.trim();
+    const content = document.getElementById('postContent').value.trim();
+    const imageUrl = document.getElementById('postImageUrl').value.trim();
 
-    if (imageFile) {
-      const storageRef = storage.ref(`posts_images/${Date.now()}_${imageFile.name}`);
-      const uploadTask = await storageRef.put(imageFile);
-      imageUrl = await uploadTask.ref.getDownloadURL();
+    if (!title || !content) {
+      alert("Inserisci sia il titolo che il testo del post!");
+      return;
     }
 
-    const newPostRef = db.ref('posts').push();
-    await newPostRef.set({
-      title: title,
-      content: content,
-      imageUrl: imageUrl,
-      likes: 0,
-      timestamp: Date.now()
-    });
+    try {
+      await db.collection('posts').add({
+        title: title,
+        content: content,
+        imageUrl: imageUrl,
+        author: author,
+        likes: 0,
+        comments: [],
+        timestamp: firebase.firestore.FieldValue.serverTimestamp()
+      });
 
-    document.getElementById('postTitle').value = '';
-    document.getElementById('postContent').value = '';
-    document.getElementById('postImage').value = '';
+      document.getElementById('postTitle').value = '';
+      document.getElementById('postContent').value = '';
+      document.getElementById('postImageUrl').value = '';
+    } catch (e) {
+      console.error("Errore durante l'invio del post: ", e);
+      alert("Errore durante la pubblicazione.");
+    }
   }
 
-  // Funzione per mettere like
-  function incrementLike(postId) {
-    db.ref(`posts/${postId}/likes`).transaction((currentLikes) => {
-      return (currentLikes || 0) + 1;
-    });
+  // Incrementa i Like su Firestore
+  async function addLike(postId, currentLikes) {
+    try {
+      await db.collection('posts').doc(postId).update({
+        likes: currentLikes + 1
+      });
+    } catch (e) {
+      console.error("Errore Like: ", e);
+    }
+  }
+
+  // Mostra / Nasconde la sezione commenti
+  function toggleComments(postId) {
+    const el = document.getElementById(`comments-${postId}`);
+    if (el.style.display === 'block') {
+      el.style.display = 'none';
+    } else {
+      el.style.display = 'block';
+    }
+  }
+
+  // Aggiunge un commento al post su Firestore
+  async function addComment(postId) {
+    const author = getLoggedUser();
+    if (!author) {
+      alert("Devi accedere per poter commentare!");
+      window.location.href = "account.html";
+      return;
+    }
+
+    const input = document.getElementById(`inputComment-${postId}`);
+    const text = input.value.trim();
+
+    if (!text) return;
+
+    try {
+      const postRef = db.collection('posts').doc(postId);
+      const doc = await postRef.get();
+
+      if (doc.exists) {
+        const currentComments = doc.data().comments || [];
+        currentComments.push({
+          author: author,
+          text: text,
+          date: new Date().toISOString()
+        });
+
+        await postRef.update({ comments: currentComments });
+        input.value = '';
+      }
+    } catch (e) {
+      console.error("Errore inserimento commento: ", e);
+    }
   }
 
   // Filtro ricerca
@@ -340,10 +490,8 @@
     const posts = document.querySelectorAll('.post-card');
 
     posts.forEach(post => {
-      const title = post.querySelector('h3').textContent.toLowerCase();
-      const content = post.querySelector('p').textContent.toLowerCase();
-
-      if (title.includes(query) || content.includes(query)) {
+      const text = post.textContent.toLowerCase();
+      if (text.includes(query)) {
         post.style.display = 'block';
       } else {
         post.style.display = 'none';
