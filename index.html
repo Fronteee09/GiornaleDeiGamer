@@ -28,6 +28,36 @@
     max-width: 760px; 
     margin: 0 auto; 
     padding: 18px; 
+    position: relative;
+  }
+
+  /* Barra superiore con pulsante Accedi */
+  .top-bar {
+    display: flex;
+    justify-content: flex-end;
+    margin-bottom: -10px;
+  }
+
+  .btn-login {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 18px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: #ffffff;
+    text-decoration: none;
+    text-shadow: 0 1px 2px rgba(0, 20, 40, 0.9);
+    border: 1px solid #7dd3fc;
+    border-radius: 999px;
+    background: linear-gradient(180deg, #38bdf8 0%, #0284c7 50%, #0369a1 51%, #0284c7 100%);
+    box-shadow: 0 0 12px rgba(56, 189, 248, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.7);
+    transition: all 0.2s ease;
+  }
+
+  .btn-login:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 0 18px rgba(56, 189, 248, 0.8), inset 0 1px 0 rgba(255, 255, 255, 0.9);
   }
 
   /* Effetto Vetro Aero / Glassmorphism Blue */
@@ -43,7 +73,7 @@
   }
 
   header.glass { 
-    margin-top: 24px; 
+    margin-top: 16px; 
     text-align: center; 
     padding: 36px 20px; 
   }
@@ -177,6 +207,11 @@
 </head>
 <body>
 <div class="wrap">
+
+  <!-- Pulsante in alto a destra per accedere all'account -->
+  <div class="top-bar">
+    <a class="btn-login" href="account.html">👤 Accedi</a>
+  </div>
 
   <header class="glass">
     <img class="logo" src="logo2.jpg" alt="Logo Giornale Dei Gamer" onerror="this.src='https://via.placeholder.com/120/0c4a6e/ffffff?text=GDG'">
