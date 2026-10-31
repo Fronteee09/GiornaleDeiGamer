@@ -1,0 +1,978 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Stick War Community · Giornale Dei Gamer</title>
+<link rel="icon" href="logo2.jpg">
+<style>
+  * { box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; }
+  body {
+    margin: 0;
+    min-height: 100vh;
+    font-family: "Segoe UI", system-ui, -apple-system, Roboto, sans-serif;
+    color: #ffedd5;
+    line-height: 1.6;
+    overflow-x: hidden;
+    background: url('stickwarsfondo.png') no-repeat center center fixed;
+    background-size: cover;
+    background-color: #431407; /* Fallback se l'immagine non carica */
+  }
+
+  .wrap { 
+    width: 100%; 
+    max-width: 760px; 
+    margin: 0 auto; 
+    padding: 18px; 
+  }
+
+  .glass {
+    background: rgba(67, 20, 7, 0.82);
+    border: 1px solid rgba(251, 146, 60, 0.45);
+    border-radius: 16px;
+    box-shadow: 0 8px 28px rgba(0, 0, 0, 0.7), inset 0 1px 0 rgba(254, 215, 170, 0.4);
+    -webkit-backdrop-filter: blur(12px);
+    backdrop-filter: blur(12px);
+    padding: 20px;
+    margin-bottom: 18px;
+    position: relative;
+  }
+
+  header.glass { 
+    margin-top: 24px; 
+    text-align: center; 
+    padding: 30px 20px; 
+  }
+
+  h1 {
+    margin: 0 0 10px;
+    font-size: clamp(1.8rem, 7vw, 2.8rem);
+    line-height: 1.1;
+    color: #ffffff;
+    text-shadow: 0 0 16px rgba(249, 115, 22, 0.9), 0 2px 4px rgba(0, 0, 0, 0.8);
+  }
+
+  header p { 
+    margin: 0; 
+    color: #fed7aa; 
+    font-size: 1.05rem; 
+  }
+
+  .admin-mail-btn {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    background: linear-gradient(180deg, #f59e0b 0%, #d97706 100%);
+    border: 1px solid #fef3c7;
+    color: white;
+    padding: 6px 14px;
+    border-radius: 999px;
+    font-weight: bold;
+    font-size: 0.85rem;
+    cursor: pointer;
+    box-shadow: 0 0 10px rgba(245, 158, 11, 0.5);
+    display: none;
+  }
+
+  .add-post-form {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-bottom: 20px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid rgba(251, 146, 60, 0.3);
+  }
+
+  .input-field {
+    width: 100%;
+    padding: 10px 14px;
+    border-radius: 8px;
+    border: 1px solid #fb923c;
+    background: rgba(255, 255, 255, 0.95);
+    color: #431407;
+    font-size: 0.95rem;
+    outline: none;
+  }
+
+  textarea.input-field {
+    resize: vertical;
+    min-height: 70px;
+  }
+
+  .submit-btn {
+    align-self: flex-start;
+    padding: 8px 20px;
+    border-radius: 999px;
+    border: 1px solid #fb923c;
+    background: linear-gradient(180deg, #fb923c 0%, #c2410c 100%);
+    color: white;
+    font-weight: 600;
+    cursor: pointer;
+    box-shadow: 0 0 10px rgba(249, 115, 22, 0.4);
+    transition: all 0.2s ease;
+  }
+
+  .submit-btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 0 14px rgba(249, 115, 22, 0.7);
+  }
+
+  .search-container {
+    margin-bottom: 16px;
+  }
+
+  .search-input {
+    width: 100%;
+    padding: 12px 18px;
+    border-radius: 999px;
+    border: 1px solid #ffffff;
+    background: #ffffff;
+    color: #431407;
+    font-size: 0.95rem;
+    outline: none;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+  }
+
+  .scroll-box {
+    max-height: 550px;
+    overflow-y: auto;
+    padding-right: 6px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .post-card {
+    background: rgba(84, 23, 7, 0.9);
+    border: 1px solid rgba(251, 146, 60, 0.35);
+    border-radius: 12px;
+    padding: 16px;
+    position: relative;
+  }
+
+  .post-header-line {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 6px;
+  }
+
+  .post-author {
+    font-size: 0.85rem;
+    color: #fb923c;
+    font-weight: bold;
+  }
+
+  .block-user-btn {
+    background: rgba(239, 68, 68, 0.2);
+    border: 1px solid #fca5a5;
+    color: #fca5a5;
+    padding: 2px 8px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.75rem;
+    font-weight: bold;
+    display: none;
+  }
+
+  .block-user-btn:hover {
+    background: rgba(239, 68, 68, 0.5);
+    color: white;
+  }
+
+  .post-card h3 {
+    margin: 0 0 8px;
+    font-size: 1.15rem;
+    color: #ffffff;
+  }
+
+  .post-card p {
+    margin: 0 0 14px;
+    color: #ffedd5;
+    font-size: 0.95rem;
+  }
+
+  .post-img {
+    width: 100%;
+    max-height: 280px;
+    object-fit: cover;
+    border-radius: 8px;
+    margin-bottom: 12px;
+    border: 1px solid rgba(251, 146, 60, 0.4);
+  }
+
+  .post-actions {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    margin-bottom: 12px;
+    flex-wrap: wrap;
+  }
+
+  .like-btn, .comment-toggle-btn, .report-btn, .comment-like-btn {
+    background: rgba(194, 65, 12, 0.5);
+    border: 1px solid #fb923c;
+    color: #ffffff;
+    padding: 6px 14px;
+    border-radius: 999px;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 0.85rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .report-btn {
+    background: rgba(245, 158, 11, 0.2);
+    border-color: #fde047;
+    color: #fef08a;
+  }
+
+  .comments-section {
+    margin-top: 10px;
+    padding-top: 10px;
+    border-top: 1px solid rgba(251, 146, 60, 0.2);
+    display: none;
+  }
+
+  .comment-item {
+    background: rgba(67, 20, 7, 0.6);
+    border-left: 3px solid #fb923c;
+    padding: 8px 12px;
+    border-radius: 4px;
+    margin-bottom: 8px;
+    font-size: 0.88rem;
+    position: relative;
+  }
+
+  .comment-header-line {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .comment-author {
+    font-weight: bold;
+    color: #fed7aa;
+    font-size: 0.8rem;
+  }
+
+  .add-comment-box {
+    display: flex;
+    gap: 8px;
+    margin-top: 10px;
+  }
+
+  .add-comment-box input {
+    flex: 1;
+    padding: 6px 12px;
+    border-radius: 999px;
+    border: 1px solid #fb923c;
+    outline: none;
+    font-size: 0.85rem;
+  }
+
+  .add-comment-box button {
+    padding: 6px 14px;
+    border-radius: 999px;
+    border: none;
+    background: #c2410c;
+    color: white;
+    cursor: pointer;
+    font-weight: bold;
+    font-size: 0.85rem;
+  }
+
+  .modal-overlay {
+    position: fixed;
+    top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(0,0,0,0.7);
+    display: none;
+    justify-content: center;
+    align-items: center;
+    z-index: 999;
+    padding: 20px;
+  }
+
+  .modal-box {
+    background: #431407;
+    border: 2px solid #fb923c;
+    border-radius: 16px;
+    width: 100%;
+    max-width: 500px;
+    max-height: 80vh;
+    display: flex;
+    flex-direction: column;
+    padding: 20px;
+  }
+
+  .modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #fb923c;
+    padding-bottom: 10px;
+    margin-bottom: 15px;
+  }
+
+  .modal-header h2 { margin: 0; font-size: 1.3rem; color: #fff; }
+  .close-modal { background: none; border: none; color: #fca5a5; font-size: 1.4rem; cursor: pointer; }
+
+  .reports-list {
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .report-card {
+    background: rgba(84, 23, 7, 0.9);
+    border: 1px solid #fde047;
+    border-radius: 8px;
+    padding: 10px;
+    font-size: 0.85rem;
+  }
+
+  .back-container { text-align: center; margin-top: 10px; margin-bottom: 20px; }
+  .btn {
+    display: inline-block; padding: 10px 24px; color: #ffffff; font-weight: 600;
+    text-decoration: none; border: 1px solid #fb923c; border-radius: 999px;
+    background: linear-gradient(180deg, #fb923c 0%, #c2410c 100%);
+  }
+  footer { text-align: center; color: #fed7aa; font-size: .9rem; padding: 10px 0 30px; }
+</style>
+
+<script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore-compat.js"></script>
+</head>
+<body>
+
+<div class="wrap">
+  <header class="glass">
+    <button id="adminMailBtn" class="admin-mail-btn" onclick="openReportsModal()">✉️ Mail (0)</button>
+    <h1>Stick War Community</h1>
+    <p>Condividi tattiche, strategie di battaglia e record personali.</p>
+  </header>
+
+  <div class="glass">
+    <div class="add-post-form">
+      <input type="text" id="postTitle" class="input-field" placeholder="Titolo del post..." required>
+      <textarea id="postContent" class="input-field" placeholder="Scrivi la tua strategia..." required></textarea>
+      <input type="text" id="postImageUrl" class="input-field" placeholder="URL Immagine (es. Reddit o link statico .jpg/.png)">
+      <button class="submit-btn" onclick="createNewPost()">Pubblica Post</button>
+    </div>
+
+    <div class="search-container">
+      <input type="text" id="searchInput" class="search-input" placeholder="🔍 Cerca nei post..." onkeyup="filterPosts()">
+    </div>
+
+    <div class="scroll-box" id="postsContainer">
+      <p style="text-align:center;">Caricamento post da Firestore...</p>
+    </div>
+  </div>
+
+  <div class="back-container">
+    <a class="btn" href="visualizzacommunity.html">Torna alle Community</a>
+  </div>
+
+  <footer>Giornale Dei Gamer · Tutti i diritti riservati</footer>
+</div>
+
+<div class="modal-overlay" id="reportsModal">
+  <div class="modal-box">
+    <div class="modal-header">
+      <h2>📬 Segnalazioni Ricevute</h2>
+      <button class="close-modal" onclick="closeReportsModal()">✖</button>
+    </div>
+    <div class="reports-list" id="reportsList">
+      <p style="text-align:center;">Nessuna segnalazione trovata.</p>
+    </div>
+  </div>
+</div>
+
+<script>
+  const firebaseConfig = {
+    apiKey: "AIzaSyDSv5h11knmaS2CaJFTpgN6lTxEYptksRk",
+    authDomain: "giornaledeigamer---social.firebaseapp.com",
+    projectId: "giornaledeigamer---social",
+    storageBucket: "giornaledeigamer---social.firebasestorage.app",
+    messagingSenderId: "490970879261",
+    appId: "1:490970879261:web:00bb9ace1800dd8dbe7df4",
+    measurementId: "G-4K0NXCRDRL"
+  };
+
+  firebase.initializeApp(firebaseConfig);
+  const db = firebase.firestore();
+
+  const SUPER_ADMIN_UID = "2NjFn7umG1RszA2dciMsr5H1f7z2";
+
+  function getLoggedUser() {
+    return localStorage.getItem('gdg_logged_user');
+  }
+
+  function isUserAdmin() {
+    const loggedUser = getLoggedUser();
+    if (!loggedUser) return false;
+
+    const cleanLogged = loggedUser.trim().toLowerCase();
+    const isFronte = cleanLogged === 'fronte ★' || cleanLogged === 'fronte';
+
+    const userKey = 'gdg_user_' + cleanLogged;
+    const userDataJson = localStorage.getItem(userKey);
+    let userUid = '';
+    
+    if (userDataJson) {
+      const userData = JSON.parse(userDataJson);
+      userUid = userData.uid || '';
+    }
+
+    return isFronte || (userUid === SUPER_ADMIN_UID);
+  }
+
+  async function checkIfBlocked(username) {
+    if (!username) return false;
+    try {
+      const doc = await db.collection('blocked_users').doc(username.trim().toLowerCase()).get();
+      return doc.exists;
+    } catch(e) {
+      return false;
+    }
+  }
+
+  async function toggleBlockUser(username) {
+    if (!isUserAdmin()) return;
+    const targetKey = username.trim().toLowerCase();
+    const docRef = db.collection('blocked_users').doc(targetKey);
+
+    try {
+      const doc = await docRef.get();
+      if (doc.exists) {
+        if (confirm(`Vuoi sbloccare l'utente ${username}?`)) {
+          await docRef.delete();
+          alert(`Utente ${username} sbloccato.`);
+        }
+      } else {
+        if (confirm(`ATTENZIONE: Vuoi bloccare l'utente ${username}? Non potrà più postare o commentare.`)) {
+          await docRef.set({ blockedBy: getLoggedUser(), timestamp: firebase.firestore.FieldValue.serverTimestamp() });
+          alert(`Utente ${username} bloccato con successo.`);
+        }
+      }
+    } catch(e) {
+      console.error("Errore blocco utente:", e);
+    }
+  }
+
+  function isValidImageUrl(url) {
+    if (!url) return true;
+    const cleanUrl = url.toLowerCase().trim();
+    const urlWithoutParams = cleanUrl.split('?')[0];
+    
+    const hasValidExtension = urlWithoutParams.endsWith('.jpg') || 
+                              urlWithoutParams.endsWith('.jpeg') || 
+                              urlWithoutParams.endsWith('.png') || 
+                              urlWithoutParams.endsWith('.webp');
+                              
+    const isGifOrVideo = urlWithoutParams.includes('.gif') || 
+                         urlWithoutParams.includes('.mp4') || 
+                         urlWithoutParams.includes('.webm') || 
+                         urlWithoutParams.includes('youtube.com') || 
+                         urlWithoutParams.includes('youtu.be');
+
+    return hasValidExtension && !isGifOrVideo;
+  }
+
+  async function changeUserCoins(authorUsername, deltaAmount) {
+    if (!authorUsername) return;
+    const cleanUser = authorUsername.trim().toLowerCase();
+    const userDocRef = db.collection('users').doc(cleanUser);
+
+    try {
+      await db.runTransaction(async (transaction) => {
+        const doc = await transaction.get(userDocRef);
+        let currentCoins = 0;
+        if (doc.exists) {
+          currentCoins = doc.data().gdgcoin || 0;
+        }
+        const newCoins = Math.max(0, currentCoins + deltaAmount);
+        transaction.set(userDocRef, { gdgcoin: newCoins }, { merge: true });
+      });
+    } catch (e) {
+      console.error("Errore aggiornamento GDGCoin:", e);
+    }
+  }
+
+  window.addEventListener('DOMContentLoaded', () => {
+    if (isUserAdmin()) {
+      const mailBtn = document.getElementById('adminMailBtn');
+      mailBtn.style.display = 'block';
+      listenToReports();
+    }
+  });
+
+  // Usiamo una collezione dedicata per Stick War: 'stickwar_posts'
+  db.collection('stickwar_posts').orderBy('timestamp', 'desc').onSnapshot((snapshot) => {
+    const container = document.getElementById('postsContainer');
+    container.innerHTML = '';
+
+    if (snapshot.empty) {
+      container.innerHTML = '<p style="text-align:center;">Nessun post presente. Scrivi la prima strategia!</p>';
+      return;
+    }
+
+    const loggedUser = getLoggedUser();
+    const cleanLogged = loggedUser ? loggedUser.trim().toLowerCase() : '';
+    const likedPostsKey = loggedUser ? ('gdg_stickwar_liked_' + cleanLogged) : '';
+    const likedPosts = loggedUser ? (JSON.parse(localStorage.getItem(likedPostsKey)) || []) : [];
+    const isAdmin = isUserAdmin();
+
+    snapshot.forEach((doc) => {
+      const post = doc.data();
+      const postId = doc.id;
+
+      const card = document.createElement('div');
+      card.className = 'post-card';
+      card.id = `post-${postId}`;
+
+      let imageHtml = '';
+      if (post.imageUrl) {
+        imageHtml = `<img class="post-img" src="${post.imageUrl}" alt="Immagine post" onerror="this.style.display='none'">`;
+      }
+
+      const commentsCount = post.comments ? post.comments.length : 0;
+      const hasLiked = likedPosts.includes(postId);
+      const likeBtnStyle = hasLiked 
+        ? "background: rgba(249, 115, 22, 0.85); border-color: #ffffff;" 
+        : "background: rgba(194, 65, 12, 0.5);";
+
+      let deletePostBtn = '';
+      if (loggedUser && (loggedUser === post.author || isAdmin)) {
+        deletePostBtn = `<button onclick="deletePost('${postId}')" style="background: rgba(239,68,68,0.6); border: 1px solid #fca5a5; color: white; padding: 4px 10px; border-radius: 6px; cursor: pointer; float: right; font-size: 0.8rem;">🗑️ Elimina Post</button>`;
+      }
+
+      let blockAuthorBtn = '';
+      if (isAdmin && post.author) {
+        blockAuthorBtn = `<button class="block-user-btn" style="display:inline-block;" onclick="toggleBlockUser('${post.author.replace(/'/g, "\\'")}')">🚫 Blocca Utente</button>`;
+      }
+
+      card.innerHTML = `
+        ${deletePostBtn}
+        <div class="post-header-line">
+          <div class="post-author">👤 ${post.author || 'Anonimo'}</div>
+          ${blockAuthorBtn}
+        </div>
+        <h3>${post.title}</h3>
+        ${imageHtml}
+        <p>${post.content}</p>
+
+        <div class="post-actions">
+          <button class="like-btn" style="${likeBtnStyle}" onclick="addLike('${postId}', ${post.likes || 0}, '${(post.author || '').replace(/'/g, "\\'")}')">
+            👍 <span>${post.likes || 0}</span>
+          </button>
+          <button class="comment-toggle-btn" onclick="toggleComments('${postId}')">
+            💬 Commenti (<span>${commentsCount}</span>)
+          </button>
+          <button class="report-btn" onclick="reportPost('${postId}', '${post.title.replace(/'/g, "\\'")}')">
+            🚩 Segnala
+          </button>
+        </div>
+
+        <div class="comments-section" id="comments-${postId}">
+          <div id="commentList-${postId}">
+            ${renderComments(post.comments || [], postId, loggedUser, isAdmin)}
+          </div>
+          <div class="add-comment-box">
+            <input type="text" id="inputComment-${postId}" placeholder="Scrivi un commento...">
+            <button onclick="addComment('${postId}')">Invia</button>
+          </div>
+        </div>
+      `;
+
+      container.appendChild(card);
+    });
+  });
+
+  function renderComments(comments, postId, loggedUser, isAdmin) {
+    if (comments.length === 0) {
+      return '<p style="font-size:0.8rem; color:#fed7aa; margin:4px 0;">Nessun commento ancora.</p>';
+    }
+    
+    const cleanLogged = loggedUser ? loggedUser.trim().toLowerCase() : '';
+    const likedCommentsKey = loggedUser ? ('gdg_stickwar_liked_comm_' + cleanLogged) : '';
+    const likedComments = loggedUser ? (JSON.parse(localStorage.getItem(likedCommentsKey)) || []) : [];
+
+    return comments.map((c, index) => {
+      const commentUid = `${postId}_${index}`;
+      const hasLikedComment = likedComments.includes(commentUid);
+      const commentLikeBtnStyle = hasLikedComment
+        ? "background: rgba(249, 115, 22, 0.85); border-color: #ffffff;"
+        : "background: rgba(194, 65, 12, 0.4);";
+
+      let deleteCommentBtn = '';
+      if (loggedUser && (loggedUser === c.author || isAdmin)) {
+        deleteCommentBtn = `<button onclick="deleteComment('${postId}', ${index})" style="background: none; border: none; color: #fca5a5; cursor: pointer; font-size: 0.8rem; float: right;" title="Elimina commento">❌</button>`;
+      }
+
+      let blockCommentAuthorBtn = '';
+      if (isAdmin && c.author) {
+        blockCommentAuthorBtn = `<button class="block-user-btn" style="display:inline-block; font-size:0.65rem; padding:1px 6px;" onclick="toggleBlockUser('${c.author.replace(/'/g, "\\'")}')">🚫 Blocca</button>`;
+      }
+
+      return `
+        <div class="comment-item">
+          ${deleteCommentBtn}
+          <div class="comment-header-line">
+            <div class="comment-author">${c.author}</div>
+            ${blockCommentAuthorBtn}
+          </div>
+          <div>${c.text}</div>
+          <div style="margin-top:4px;">
+            <button class="comment-like-btn" style="${commentLikeBtnStyle} font-size:0.75rem; padding:2px 8px;" onclick="addCommentLike('${postId}', ${index}, '${(c.author || '').replace(/'/g, "\\'")}')">
+              👍 <span>${c.likes || 0}</span>
+            </button>
+          </div>
+        </div>
+      `;
+    }).join('');
+  }
+
+  async function createNewPost() {
+    const author = getLoggedUser();
+    if (!author) {
+      alert("Devi prima accedere con il tuo account per pubblicare un post!");
+      window.location.href = "account.html";
+      return;
+    }
+
+    if (await checkIfBlocked(author)) {
+      alert("Il tuo account è stato bloccato dall'amministratore. Non puoi pubblicare post.");
+      return;
+    }
+
+    const title = document.getElementById('postTitle').value.trim();
+    const content = document.getElementById('postContent').value.trim();
+    const imageUrl = document.getElementById('postImageUrl').value.trim();
+
+    if (!title || !content) {
+      alert("Inserisci sia il titolo che il testo del post!");
+      return;
+    }
+
+    if (!isValidImageUrl(imageUrl)) {
+      alert("Link non valido! Puoi inserire solo link di immagini statiche (es. Reddit, .jpg, .png, .webp). Niente GIF, video o siti web.");
+      return;
+    }
+
+    try {
+      await db.collection('stickwar_posts').add({
+        title: title,
+        content: content,
+        imageUrl: imageUrl,
+        author: author,
+        likes: 0,
+        comments: [],
+        timestamp: firebase.firestore.FieldValue.serverTimestamp()
+      });
+
+      document.getElementById('postTitle').value = '';
+      document.getElementById('postContent').value = '';
+      document.getElementById('postImageUrl').value = '';
+    } catch (e) {
+      console.error("Errore pubblicazione:", e);
+      alert("Errore durante la pubblicazione.");
+    }
+  }
+
+  async function addLike(postId, currentLikes, postAuthor) {
+    const loggedUser = getLoggedUser();
+    if (!loggedUser) {
+      alert("Devi accedere per mettere un like!");
+      window.location.href = "account.html";
+      return;
+    }
+
+    const cleanLogged = loggedUser.trim().toLowerCase();
+    const likedPostsKey = 'gdg_stickwar_liked_' + cleanLogged;
+    let likedPosts = JSON.parse(localStorage.getItem(likedPostsKey)) || [];
+    const postRef = db.collection('stickwar_posts').doc(postId);
+
+    try {
+      if (likedPosts.includes(postId)) {
+        likedPosts = likedPosts.filter(id => id !== postId);
+        const newLikes = Math.max(0, currentLikes - 1);
+        await postRef.update({ likes: newLikes });
+        await changeUserCoins(postAuthor, -5);
+      } else {
+        likedPosts.push(postId);
+        const newLikes = currentLikes + 1;
+        await postRef.update({ likes: newLikes });
+        await changeUserCoins(postAuthor, 5);
+      }
+
+      localStorage.setItem(likedPostsKey, JSON.stringify(likedPosts));
+    } catch (e) {
+      console.error("Errore gestione like post:", e);
+    }
+  }
+
+  async function addCommentLike(postId, commentIndex, commentAuthor) {
+    const loggedUser = getLoggedUser();
+    if (!loggedUser) {
+      alert("Devi accedere per mettere un like ai commenti!");
+      window.location.href = "account.html";
+      return;
+    }
+
+    const cleanLogged = loggedUser.trim().toLowerCase();
+    const likedCommentsKey = 'gdg_stickwar_liked_comm_' + cleanLogged;
+    let likedComments = JSON.parse(localStorage.getItem(likedCommentsKey)) || [];
+    const commentUid = `${postId}_${commentIndex}`;
+
+    try {
+      const postRef = db.collection('stickwar_posts').doc(postId);
+      const doc = await postRef.get();
+
+      if (doc.exists) {
+        let comments = doc.data().comments || [];
+        if (!comments[commentIndex]) return;
+
+        let currentCommentLikes = comments[commentIndex].likes || 0;
+
+        if (likedComments.includes(commentUid)) {
+          likedComments = likedComments.filter(id => id !== commentUid);
+          comments[commentIndex].likes = Math.max(0, currentCommentLikes - 1);
+          await postRef.update({ comments: comments });
+          await changeUserCoins(commentAuthor, -5);
+        } else {
+          likedComments.push(commentUid);
+          comments[commentIndex].likes = currentCommentLikes + 1;
+          await postRef.update({ comments: comments });
+          await changeUserCoins(commentAuthor, 5);
+        }
+
+        localStorage.setItem(likedCommentsKey, JSON.stringify(likedComments));
+      }
+    } catch (e) {
+      console.error("Errore gestione like commento:", e);
+    }
+  }
+
+  async function addComment(postId) {
+    const author = getLoggedUser();
+    if (!author) {
+      alert("Devi accedere per poter commentare!");
+      window.location.href = "account.html";
+      return;
+    }
+
+    if (await checkIfBlocked(author)) {
+      alert("Il tuo account è stato bloccato dall'amministratore. Non puoi commentare.");
+      return;
+    }
+
+    const input = document.getElementById(`inputComment-${postId}`);
+    const text = input.value.trim();
+
+    if (!text) return;
+
+    try {
+      const postRef = db.collection('stickwar_posts').doc(postId);
+      const doc = await postRef.get();
+
+      if (doc.exists) {
+        const currentComments = doc.data().comments || [];
+        currentComments.push({
+          author: author,
+          text: text,
+          likes: 0,
+          date: new Date().toISOString()
+        });
+
+        await postRef.update({ comments: currentComments });
+        input.value = '';
+      }
+    } catch (e) {
+      console.error("Errore inserimento commento: ", e);
+    }
+  }
+
+  async function reportPost(postId, postTitle) {
+    const loggedUser = getLoggedUser();
+    if (!loggedUser) {
+      alert("Devi accedere per segnalare un post!");
+      window.location.href = "account.html";
+      return;
+    }
+
+    const reason = prompt(`Perché stai segnalando il post "${postTitle}"?`);
+    if (!reason || !reason.trim()) return;
+
+    try {
+      await db.collection('reports').add({
+        postId: postId,
+        postTitle: postTitle,
+        reportedBy: loggedUser,
+        reason: reason.trim(),
+        timestamp: firebase.firestore.FieldValue.serverTimestamp()
+      });
+
+      alert("Segnalazione inviata con successo al moderatore (Fronte ★). Grazie!");
+    } catch (e) {
+      console.error("Errore durante la segnalazione: ", e);
+      alert("Impossibile inviare la segnalazione.");
+    }
+  }
+
+  function listenToReports() {
+    db.collection('reports').onSnapshot((snapshot) => {
+      const mailBtn = document.getElementById('adminMailBtn');
+      const reportsList = document.getElementById('reportsList');
+      
+      const count = snapshot.size;
+      mailBtn.textContent = `✉️ Mail (${count})`;
+
+      if (snapshot.empty) {
+        reportsList.innerHTML = '<p style="text-align:center; color:#fed7aa;">Nessuna segnalazione attiva.</p>';
+        return;
+      }
+
+      reportsList.innerHTML = '';
+      snapshot.forEach((doc) => {
+        const rep = doc.data();
+        const repId = doc.id;
+
+        const div = document.createElement('div');
+        div.className = 'report-card';
+        div.innerHTML = `
+          <div><strong>Post:</strong> ${rep.postTitle}</div>
+          <div><strong>Segnalato da:</strong> ${rep.reportedBy}</div>
+          <div><strong>Motivo:</strong> "${rep.reason}"</div>
+          <div style="margin-top: 8px; display: flex; gap: 6px;">
+            <button onclick="goToAndInspect('${rep.postId}')" style="background:#c2410c; color:white; border:none; padding:4px 8px; border-radius:4px; cursor:pointer; font-size:0.75rem;">🔍 Vai al post</button>
+            <button onclick="dismissReport('${repId}')" style="background:#4b5563; color:white; border:none; padding:4px 8px; border-radius:4px; cursor:pointer; font-size:0.75rem;">Chiudi segnalazione</button>
+          </div>
+        `;
+        reportsList.appendChild(div);
+      });
+    });
+  }
+
+  function goToAndInspect(postId) {
+    closeReportsModal();
+    const targetCard = document.getElementById(`post-${postId}`);
+    if (targetCard) {
+      targetCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      targetCard.style.border = '2px solid #fde047';
+      setTimeout(() => { targetCard.style.border = '1px solid rgba(251, 146, 60, 0.35)'; }, 3000);
+    } else {
+      alert("Questo post potrebbe essere già stato eliminato!");
+    }
+  }
+
+  async function dismissReport(reportId) {
+    try {
+      await db.collection('reports').doc(reportId).delete();
+    } catch(e) {
+      console.error(e);
+    }
+  }
+
+  function openReportsModal() { document.getElementById('reportsModal').style.display = 'flex'; }
+  function closeReportsModal() { document.getElementById('reportsModal').style.display = 'none'; }
+
+  function toggleComments(postId) {
+    const el = document.getElementById(`comments-${postId}`);
+    if (el.style.display === 'block') {
+      el.style.display = 'none';
+    } else {
+      el.style.display = 'block';
+    }
+  }
+
+  async function deletePost(postId) {
+    const loggedUser = getLoggedUser();
+    if (!loggedUser) {
+      alert("Devi effettuare l'accesso!");
+      return;
+    }
+
+    try {
+      const postRef = db.collection('stickwar_posts').doc(postId);
+      const doc = await postRef.get();
+
+      if (!doc.exists) {
+        alert("Il post non esiste.");
+        return;
+      }
+
+      const postData = doc.data();
+      const isAuthor = postData.author === loggedUser;
+      const isAdmin = isUserAdmin();
+
+      if (!isAuthor && !isAdmin) {
+        alert("Non sei autorizzato a eliminare questo post!");
+        return;
+      }
+
+      if (!confirm("Sei sicuro di voler eliminare questo post?")) return;
+
+      await postRef.delete();
+    } catch (e) {
+      console.error("Errore durante l'eliminazione del post:", e);
+      alert("Impossibile eliminare il post.");
+    }
+  }
+
+  async function deleteComment(postId, commentIndex) {
+    const loggedUser = getLoggedUser();
+    if (!loggedUser) {
+      alert("Devi effettuare l'accesso!");
+      return;
+    }
+
+    try {
+      const postRef = db.collection('stickwar_posts').doc(postId);
+      const doc = await postRef.get();
+
+      if (!doc.exists) return;
+
+      let comments = doc.data().comments || [];
+      const targetComment = comments[commentIndex];
+
+      if (!targetComment) return;
+
+      const isCommentAuthor = targetComment.author === loggedUser;
+      const isAdmin = isUserAdmin();
+
+      if (!isCommentAuthor && !isAdmin) {
+        alert("Non sei autorizzato a eliminare questo commento!");
+        return;
+      }
+
+      if (!confirm("Vuoi eliminare questo commento?")) return;
+
+      comments.splice(commentIndex, 1);
+      await postRef.update({ comments: comments });
+    } catch (e) {
+      console.error("Errore durante l'eliminazione del commento:", e);
+      alert("Impossibile eliminare il commento.");
+    }
+  }
+
+  function filterPosts() {
+    const query = document.getElementById('searchInput').value.toLowerCase();
+    const posts = document.querySelectorAll('.post-card');
+
+    posts.forEach(post => {
+      const text = post.textContent.toLowerCase();
+      if (text.includes(query)) {
+        post.style.display = 'block';
+      } else {
+        post.style.display = 'none';
+      }
+    });
+  }
+</script>
+</body>
+</html>
