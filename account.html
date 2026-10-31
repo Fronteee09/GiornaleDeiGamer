@@ -18,9 +18,7 @@
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    background: url('img/sfondominecraft1.png') no-repeat center center fixed;
-    background-size: cover;
-    background-color: #0c4a6e;
+    background: linear-gradient(135deg, #0f172a 0%, #0c4a6e 100%);
     padding: 20px;
   }
 
@@ -167,6 +165,12 @@
       <input type="password" id="password" class="input-field" placeholder="Inserisci la password...">
     </div>
 
+    <!-- Campo URL Avatar visibile solo durante la registrazione -->
+    <div class="input-group" id="avatarGroup" style="display: none;">
+      <label for="avatarUrl">URL Immagine Profilo (opzionale)</label>
+      <input type="text" id="avatarUrl" class="input-field" placeholder="https://... (lascia vuoto per il default)">
+    </div>
+
     <button class="action-btn" id="submitBtn" onclick="handleAuth()">Accedi</button>
     
     <div id="messageBox"></div>
@@ -200,7 +204,6 @@
 <script>
   let isRegistering = false;
 
-  // Controlla lo stato all'avvio della pagina
   window.addEventListener('DOMContentLoaded', () => {
     checkLoggedState();
   });
@@ -212,6 +215,7 @@
     const subtitle = document.getElementById('formSubtitle');
     const btn = document.getElementById('submitBtn');
     const toggleLink = document.getElementById('toggleModeBtn');
+    const avatarGroup = document.getElementById('avatarGroup');
     
     document.getElementById('messageBox').innerHTML = '';
 
@@ -220,11 +224,13 @@
       subtitle.textContent = "Crea un nuovo account gamer";
       btn.textContent = "Crea Account";
       toggleLink.textContent = "Hai già un account? Accedi";
+      avatarGroup.style.display = 'block';
     } else {
       title.textContent = "Accedi";
       subtitle.textContent = "Gestisci il tuo profilo su Giornale Dei Gamer";
       btn.textContent = "Accedi";
       toggleLink.textContent = "Non hai un account? Registrati";
+      avatarGroup.style.display = 'none';
     }
   }
 
@@ -232,29 +238,30 @@
   function handleAuth() {
     const usernameInput = document.getElementById('username').value.trim();
     const passwordInput = document.getElementById('password').value.trim();
+    const avatarInput = document.getElementById('avatarUrl').value.trim();
     const messageBox = document.getElementById('messageBox');
 
     messageBox.innerHTML = '';
 
     if (!usernameInput || !passwordInput) {
-      messageBox.innerHTML = '<div class="error-msg">Compila tutti i campi!</div>';
+      messageBox.innerHTML = '<div class="error-msg">Compila tutti i campi obbligatori!</div>';
       return;
     }
 
     const userKey = 'gdg_user_' + usernameInput.toLowerCase();
 
     if (isRegistering) {
-      // Eccezione: se il nome utente è 'fronte', permettiamo la registrazione/sovrascrizione senza blocchi
-      if (localStorage.getItem(userKey) && usernameInput.toLowerCase() !== 'fronte') {
+      // Controllo ripristinato: blocca se il nickname esiste già
+      if (localStorage.getItem(userKey)) {
         messageBox.innerHTML = '<div class="error-msg">Questo nome utente esiste già!</div>';
         return;
       }
 
-      // Salva utente
+      // Salva utente con eventuale avatar personalizzato
       const userData = {
         username: usernameInput,
         password: passwordInput,
-        avatar: 'logo2.jpg'
+        avatar: avatarInput || 'logo2.jpg'
       };
       localStorage.setItem(userKey, JSON.stringify(userData));
       localStorage.setItem('gdg_logged_user', usernameInput);
@@ -282,7 +289,7 @@
     }
   }
 
-  // Controlla se c'è un utente loggato nel localStorage
+  // Controlla se c'è un utente loggato
   function checkLoggedState() {
     const loggedUser = localStorage.getItem('gdg_logged_user');
     const authContainer = document.getElementById('authFormContainer');
@@ -294,7 +301,7 @@
 
       document.getElementById('loggedUsername').textContent = loggedUser;
 
-      // Carica avatar personalizzato se presente
+      // Carica avatar personalizzato
       const userKey = 'gdg_user_' + loggedUser.toLowerCase();
       const userDataJson = localStorage.getItem(userKey);
       if (userDataJson) {
@@ -346,6 +353,7 @@
     localStorage.removeItem('gdg_logged_user');
     document.getElementById('username').value = '';
     document.getElementById('password').value = '';
+    document.getElementById('avatarUrl').value = '';
     document.getElementById('messageBox').innerHTML = '';
     checkLoggedState();
   }
