@@ -165,7 +165,7 @@
       <input type="password" id="password" class="input-field" placeholder="Inserisci la password...">
     </div>
 
-    <!-- Campo URL Avatar visibile solo durante la registrazione -->
+    <!-- Campo URL Avatar (inizialmente nascosto, compare in registrazione) -->
     <div class="input-group" id="avatarGroup" style="display: none;">
       <label for="avatarUrl">URL Immagine Profilo (opzionale)</label>
       <input type="text" id="avatarUrl" class="input-field" placeholder="https://... (lascia vuoto per il default)">
@@ -224,13 +224,13 @@
       subtitle.textContent = "Crea un nuovo account gamer";
       btn.textContent = "Crea Account";
       toggleLink.textContent = "Hai già un account? Accedi";
-      avatarGroup.style.display = 'block';
+      avatarGroup.style.display = 'block'; // Mostra il campo URL immagine
     } else {
       title.textContent = "Accedi";
       subtitle.textContent = "Gestisci il tuo profilo su Giornale Dei Gamer";
       btn.textContent = "Accedi";
       toggleLink.textContent = "Non hai un account? Registrati";
-      avatarGroup.style.display = 'none';
+      avatarGroup.style.display = 'none'; // Nasconde il campo URL immagine
     }
   }
 
@@ -251,13 +251,13 @@
     const userKey = 'gdg_user_' + usernameInput.toLowerCase();
 
     if (isRegistering) {
-      // Controllo ripristinato: blocca se il nickname esiste già
+      // Controllo esistenza utente attivo
       if (localStorage.getItem(userKey)) {
         messageBox.innerHTML = '<div class="error-msg">Questo nome utente esiste già!</div>';
         return;
       }
 
-      // Salva utente con eventuale avatar personalizzato
+      // Salva utente con avatar personalizzato o default
       const userData = {
         username: usernameInput,
         password: passwordInput,
@@ -353,7 +353,8 @@
     localStorage.removeItem('gdg_logged_user');
     document.getElementById('username').value = '';
     document.getElementById('password').value = '';
-    document.getElementById('avatarUrl').value = '';
+    const avatarInput = document.getElementById('avatarUrl');
+    if (avatarInput) avatarInput.value = '';
     document.getElementById('messageBox').innerHTML = '';
     checkLoggedState();
   }
