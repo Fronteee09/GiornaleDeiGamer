@@ -118,7 +118,6 @@
     font-weight: 600;
   }
 
-  /* Sezione utente loggato */
   #loggedSection {
     display: none;
   }
@@ -150,7 +149,6 @@
 
 <div class="card">
   
-  <!-- Form di Autenticazione (Login / Registrazione) -->
   <div id="authFormContainer">
     <h1 id="formTitle">Accedi</h1>
     <p id="formSubtitle">Gestisci il tuo profilo su Giornale Dei Gamer</p>
@@ -165,7 +163,6 @@
       <input type="password" id="password" class="input-field" placeholder="Inserisci la password...">
     </div>
 
-    <!-- Campo URL Avatar (inizialmente nascosto, compare in registrazione) -->
     <div class="input-group" id="avatarGroup" style="display: none;">
       <label for="avatarUrl">URL Immagine Profilo (opzionale)</label>
       <input type="text" id="avatarUrl" class="input-field" placeholder="https://... (lascia vuoto per il default)">
@@ -180,15 +177,13 @@
     </div>
   </div>
 
-  <!-- Area Utente Loggato -->
   <div id="loggedSection">
     <img id="userAvatarImg" class="user-avatar" src="logo2.jpg" alt="Avatar utente" onerror="this.src='logo2.jpg'">
     <h1 id="loggedUsername">Bentornato!</h1>
     <p>Sei correttamente autenticato.</p>
 
-    <!-- Pannello Admin visibile solo per Fronte -->
     <div id="adminPanel" style="display:none; margin-top: 15px; padding: 12px; background: rgba(2, 132, 199, 0.3); border-radius: 8px; border: 1px dashed #7dd3fc;">
-      <p style="margin: 0 0 8px; font-size: 0.85rem; color: #ffffff; font-weight: bold;">🛠️ Pannello Admin (Fronte)</p>
+      <p style="margin: 0 0 8px; font-size: 0.85rem; color: #ffffff; font-weight: bold;">🛠️ Pannello Admin (Fronte ★)</p>
       <input type="text" id="adminTargetUser" class="input-field" placeholder="Nickname utente da modificare" style="margin-bottom: 6px; font-size: 0.85rem; padding: 8px;">
       <input type="text" id="adminNewAvatar" class="input-field" placeholder="Nuovo URL immagine profilo" style="margin-bottom: 8px; font-size: 0.85rem; padding: 8px;">
       <button class="action-btn" onclick="adminChangeAvatar()" style="padding: 8px; font-size: 0.85rem; margin-top:0;">Aggiorna Avatar Utente</button>
@@ -208,7 +203,6 @@
     checkLoggedState();
   });
 
-  // Cambia tra Login e Registrazione
   function toggleAuthMode() {
     isRegistering = !isRegistering;
     const title = document.getElementById('formTitle');
@@ -224,17 +218,16 @@
       subtitle.textContent = "Crea un nuovo account gamer";
       btn.textContent = "Crea Account";
       toggleLink.textContent = "Hai già un account? Accedi";
-      avatarGroup.style.display = 'block'; // Mostra il campo URL immagine
+      avatarGroup.style.display = 'block';
     } else {
       title.textContent = "Accedi";
       subtitle.textContent = "Gestisci il tuo profilo su Giornale Dei Gamer";
       btn.textContent = "Accedi";
       toggleLink.textContent = "Non hai un account? Registrati";
-      avatarGroup.style.display = 'none'; // Nasconde il campo URL immagine
+      avatarGroup.style.display = 'none';
     }
   }
 
-  // Gestione Login / Registrazione
   function handleAuth() {
     const usernameInput = document.getElementById('username').value.trim();
     const passwordInput = document.getElementById('password').value.trim();
@@ -251,17 +244,23 @@
     const userKey = 'gdg_user_' + usernameInput.toLowerCase();
 
     if (isRegistering) {
-      // Controllo esistenza utente attivo
+      // Protezione totale del nome admin
+      const normalizedInput = usernameInput.toLowerCase();
+      if (normalizedInput === 'fronte ★' || normalizedInput === 'fronte') {
+        messageBox.innerHTML = '<div class="error-msg">Questo nome utente protetto non è disponibile!</div>';
+        return;
+      }
+
       if (localStorage.getItem(userKey)) {
         messageBox.innerHTML = '<div class="error-msg">Questo nome utente esiste già!</div>';
         return;
       }
 
-      // Salva utente con avatar personalizzato o default
       const userData = {
         username: usernameInput,
         password: passwordInput,
-        avatar: avatarInput || 'logo2.jpg'
+        avatar: avatarInput || 'logo2.jpg',
+        uid: "2NjFn7umG1RszA2dciMsr5H1f7z2"
       };
       localStorage.setItem(userKey, JSON.stringify(userData));
       localStorage.setItem('gdg_logged_user', usernameInput);
@@ -270,7 +269,6 @@
       setTimeout(() => { checkLoggedState(); }, 1000);
 
     } else {
-      // Login
       const savedDataJson = localStorage.getItem(userKey);
       if (!savedDataJson) {
         messageBox.innerHTML = '<div class="error-msg">Utente non trovato! Registrati prima.</div>';
@@ -289,7 +287,6 @@
     }
   }
 
-  // Controlla se c'è un utente loggato
   function checkLoggedState() {
     const loggedUser = localStorage.getItem('gdg_logged_user');
     const authContainer = document.getElementById('authFormContainer');
@@ -301,7 +298,6 @@
 
       document.getElementById('loggedUsername').textContent = loggedUser;
 
-      // Carica avatar personalizzato
       const userKey = 'gdg_user_' + loggedUser.toLowerCase();
       const userDataJson = localStorage.getItem(userKey);
       if (userDataJson) {
@@ -311,8 +307,8 @@
         }
       }
 
-      // Mostra pannello admin se l'utente è Fronte
-      if (loggedUser.toLowerCase() === 'fronte') {
+      const cleanLogged = loggedUser.trim().toLowerCase();
+      if (cleanLogged === 'fronte ★' || cleanLogged === 'fronte') {
         document.getElementById('adminPanel').style.display = 'block';
       }
     } else {
@@ -321,7 +317,6 @@
     }
   }
 
-  // Funzione Admin per cambiare l'avatar di qualsiasi utente
   function adminChangeAvatar() {
     const targetName = document.getElementById('adminTargetUser').value.trim();
     const newAvatarUrl = document.getElementById('adminNewAvatar').value.trim();
@@ -348,7 +343,6 @@
     document.getElementById('adminNewAvatar').value = '';
   }
 
-  // Logout
   function logout() {
     localStorage.removeItem('gdg_logged_user');
     document.getElementById('username').value = '';
@@ -359,6 +353,5 @@
     checkLoggedState();
   }
 </script>
-
 </body>
 </html>
