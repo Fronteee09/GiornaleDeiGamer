@@ -56,7 +56,6 @@
     font-size: 1.05rem; 
   }
 
-  /* Form creazione Post */
   .add-post-form {
     display: flex;
     flex-direction: column;
@@ -186,7 +185,6 @@
     background: rgba(2, 132, 199, 0.8);
   }
 
-  /* Sezione Commenti */
   .comments-section {
     margin-top: 10px;
     padding-top: 10px;
@@ -261,7 +259,6 @@
   }
 </style>
 
-<!-- Firebase SDKs Compat per Firestore -->
 <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore-compat.js"></script>
 
@@ -275,8 +272,6 @@
   </header>
 
   <div class="glass">
-
-    <!-- Form creazione Post -->
     <div class="add-post-form">
       <input type="text" id="postTitle" class="input-field" placeholder="Titolo del post..." required>
       <textarea id="postContent" class="input-field" placeholder="Scrivi il tuo messaggio..." required></textarea>
@@ -284,12 +279,10 @@
       <button class="submit-btn" onclick="createNewPost()">Pubblica Post</button>
     </div>
 
-    <!-- Barra di ricerca -->
     <div class="search-container">
       <input type="text" id="searchInput" class="search-input" placeholder="🔍 Cerca nei post..." onkeyup="filterPosts()">
     </div>
 
-    <!-- Lista post -->
     <div class="scroll-box" id="postsContainer">
       <p style="text-align:center;">Caricamento post da Firestore...</p>
     </div>
@@ -304,7 +297,6 @@
 </div>
 
 <script>
-  // Configurazione Firebase
   const firebaseConfig = {
     apiKey: "AIzaSyDSv5h11knmaS2CaJFTpgN6lTxEYptksRk",
     authDomain: "giornaledeigamer---social.firebaseapp.com",
@@ -318,21 +310,21 @@
   firebase.initializeApp(firebaseConfig);
   const db = firebase.firestore();
 
-  // UID di Admin con permessi di moderazione totale
   const SUPER_ADMIN_UID = "2NjFn7umG1RszA2dciMsr5H1f7z2";
 
-  // Recupera l'utente attualmente loggato da localStorage
   function getLoggedUser() {
     return localStorage.getItem('gdg_logged_user');
   }
 
-  // Controlla se l'utente corrente ha i permessi da Amministratore Supremo
+  // Verifica permessi Admin per "Fronte ★" o per l'UID specifico
   function isUserAdmin() {
     const loggedUser = getLoggedUser();
     if (!loggedUser) return false;
 
-    // Recupera i dati utente registrati nel localStorage
-    const userKey = 'gdg_user_' + loggedUser.toLowerCase();
+    const cleanLogged = loggedUser.trim().toLowerCase();
+    const isFronte = cleanLogged === 'fronte ★' || cleanLogged === 'fronte';
+
+    const userKey = 'gdg_user_' + cleanLogged;
     const userDataJson = localStorage.getItem(userKey);
     let userUid = '';
     
@@ -341,10 +333,9 @@
       userUid = userData.uid || '';
     }
 
-    return (loggedUser.toLowerCase() === 'fronte') || (userUid === SUPER_ADMIN_UID);
+    return isFronte || (userUid === SUPER_ADMIN_UID);
   }
 
-  // Ascolto in tempo reale dei post su Firestore
   db.collection('posts').onSnapshot((snapshot) => {
     const container = document.getElementById('postsContainer');
     container.innerHTML = '';
@@ -355,7 +346,7 @@
     }
 
     const loggedUser = getLoggedUser();
-    const likedPostsKey = loggedUser ? ('gdg_liked_posts_' + loggedUser) : '';
+    const likedPostsKey = loggedUser ? ('gdg_liked_posts_' + loggedUser.trim().toLowerCase()) : '';
     const likedPosts = loggedUser ? (JSON.parse(localStorage.getItem(likedPostsKey)) || []) : [];
     const isAdmin = isUserAdmin();
 
@@ -377,7 +368,6 @@
         ? "background: rgba(56, 189, 248, 0.85); border-color: #ffffff;" 
         : "background: rgba(2, 132, 199, 0.5);";
 
-      // Mostra il tasto elimina se l'utente è l'autore O se è Admin (Fronte / UID Admin)
       let deletePostBtn = '';
       if (loggedUser && (loggedUser === post.author || isAdmin)) {
         deletePostBtn = `<button onclick="deletePost('${postId}')" style="background: rgba(239,68,68,0.6); border: 1px solid #fca5a5; color: white; padding: 4px 10px; border-radius: 6px; cursor: pointer; float: right; font-size: 0.8rem;">🗑️ Elimina Post</button>`;
@@ -399,7 +389,6 @@
           </button>
         </div>
 
-        <!-- Sezione Commenti -->
         <div class="comments-section" id="comments-${postId}">
           <div id="commentList-${postId}">
             ${renderComments(post.comments || [], postId, loggedUser, isAdmin)}
@@ -415,7 +404,6 @@
     });
   });
 
-  // Renderizza i commenti e gestisce i permessi di eliminazione
   function renderComments(comments, postId, loggedUser, isAdmin) {
     if (comments.length === 0) {
       return '<p style="font-size:0.8rem; color:#bae6fd; margin:4px 0;">Nessun commento ancora.</p>';
@@ -437,7 +425,6 @@
     }).join('');
   }
 
-  // Pubblica un nuovo post
   async function createNewPost() {
     const author = getLoggedUser();
     if (!author) {
@@ -475,7 +462,6 @@
     }
   }
 
-  // Sistema di Like intelligente (Metti / Togli Mi Piace)
   async function addLike(postId, currentLikes) {
     const loggedUser = getLoggedUser();
     if (!loggedUser) {
@@ -484,7 +470,7 @@
       return;
     }
 
-    const likedPostsKey = 'gdg_liked_posts_' + loggedUser;
+    const likedPostsKey = 'gdg_liked_posts_' + loggedUser.trim().toLowerCase();
     let likedPosts = JSON.parse(localStorage.getItem(likedPostsKey)) || [];
     const postRef = db.collection('posts').doc(postId);
 
@@ -505,7 +491,6 @@
     }
   }
 
-  // Mostra / Nasconde la sezione commenti
   function toggleComments(postId) {
     const el = document.getElementById(`comments-${postId}`);
     if (el.style.display === 'block') {
@@ -515,7 +500,6 @@
     }
   }
 
-  // Aggiunge un commento al post su Firestore
   async function addComment(postId) {
     const author = getLoggedUser();
     if (!author) {
@@ -549,7 +533,6 @@
     }
   }
 
-  // Funzione sicura per eliminare un intero post
   async function deletePost(postId) {
     const loggedUser = getLoggedUser();
     if (!loggedUser) {
@@ -584,7 +567,6 @@
     }
   }
 
-  // Funzione sicura per eliminare un singolo commento
   async function deleteComment(postId, commentIndex) {
     const loggedUser = getLoggedUser();
     if (!loggedUser) {
@@ -621,7 +603,6 @@
     }
   }
 
-  // Filtro ricerca
   function filterPosts() {
     const query = document.getElementById('searchInput').value.toLowerCase();
     const posts = document.querySelectorAll('.post-card');
@@ -636,6 +617,5 @@
     });
   }
 </script>
-
 </body>
 </html>
