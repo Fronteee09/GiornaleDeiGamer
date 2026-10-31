@@ -171,7 +171,7 @@
     cursor: pointer;
     font-size: 0.75rem;
     font-weight: bold;
-    display: none; /* Visibile solo per l'admin */
+    display: none;
   }
 
   .block-user-btn:hover {
@@ -352,14 +352,13 @@
     <button id="adminMailBtn" class="admin-mail-btn" onclick="openReportsModal()">✉️ Mail (0)</button>
     <h1>Minecraft Community</h1>
     <p>Condividi idee, costruzioni e commenti con gli altri gamer.</p>
-    <div style="margin-top:8px;"><a href="visualizzacommunity.html" style="color:#7dd3fc; font-size:0.9rem;">← Torna alle Community</a></div>
   </header>
 
   <div class="glass">
     <div class="add-post-form">
       <input type="text" id="postTitle" class="input-field" placeholder="Titolo del post..." required>
       <textarea id="postContent" class="input-field" placeholder="Scrivi il tuo messaggio..." required></textarea>
-      <input type="text" id="postImageUrl" class="input-field" placeholder="URL Immagine (es. https://.../foto.jpg - Solo immagini statiche)">
+      <input type="text" id="postImageUrl" class="input-field" placeholder="URL Immagine (es. Reddit o link statico .jpg/.png)">
       <button class="submit-btn" onclick="createNewPost()">Pubblica Post</button>
     </div>
 
@@ -430,7 +429,6 @@
     return isFronte || (userUid === SUPER_ADMIN_UID);
   }
 
-  // Funzione per verificare se un utente è bloccato
   async function checkIfBlocked(username) {
     if (!username) return false;
     try {
@@ -441,7 +439,6 @@
     }
   }
 
-  // Funzione Admin per bloccare/sbloccare un utente
   async function toggleBlockUser(username) {
     if (!isUserAdmin()) return;
     const targetKey = username.trim().toLowerCase();
@@ -465,23 +462,22 @@
     }
   }
 
-  // Filtro rigoroso per accettare solo immagini statiche (no GIF, no siti web, no video)
+  // Filtro immagine aggiornato per gestire i parametri di Reddit (es. ?width=1080...)
   function isValidImageUrl(url) {
-    if (!url) return true; // Se è vuoto è opzionale, quindi valido
+    if (!url) return true;
     const cleanUrl = url.toLowerCase().trim();
+    const urlWithoutParams = cleanUrl.split('?')[0];
     
-    // Controlla estensioni per sole immagini fisse
-    const hasValidExtension = cleanUrl.endsWith('.jpg') || 
-                              cleanUrl.endsWith('.jpeg') || 
-                              cleanUrl.endsWith('.png') || 
-                              cleanUrl.endsWith('.webp');
+    const hasValidExtension = urlWithoutParams.endsWith('.jpg') || 
+                              urlWithoutParams.endsWith('.jpeg') || 
+                              urlWithoutParams.endsWith('.png') || 
+                              urlWithoutParams.endsWith('.webp');
                               
-    // Esclude esplicitamente gif, video o link generici
-    const isGifOrVideo = cleanUrl.includes('.gif') || 
-                         cleanUrl.includes('.mp4') || 
-                         cleanUrl.includes('.webm') || 
-                         cleanUrl.includes('youtube.com') || 
-                         cleanUrl.includes('youtu.be');
+    const isGifOrVideo = urlWithoutParams.includes('.gif') || 
+                         urlWithoutParams.includes('.mp4') || 
+                         urlWithoutParams.includes('.webm') || 
+                         urlWithoutParams.includes('youtube.com') || 
+                         urlWithoutParams.includes('youtu.be');
 
     return hasValidExtension && !isGifOrVideo;
   }
@@ -647,7 +643,6 @@
       return;
     }
 
-    // Controllo se l'utente è bloccato
     if (await checkIfBlocked(author)) {
       alert("Il tuo account è stato bloccato dall'amministratore. Non puoi pubblicare post.");
       return;
@@ -662,9 +657,8 @@
       return;
     }
 
-    // Validazione rigorosa dell'immagine (solo immagini fisse, no GIF/video/siti web)
     if (!isValidImageUrl(imageUrl)) {
-      alert("Link non valido! Puoi inserire solo link di immagini statiche (terminanti in .jpg, .jpeg, .png, .webp). Niente GIF, video o siti web.");
+      alert("Link non valido! Puoi inserire solo link di immagini statiche (es. Reddit, .jpg, .png, .webp). Niente GIF, video o siti web.");
       return;
     }
 
@@ -770,7 +764,6 @@
       return;
     }
 
-    // Controllo se l'utente è bloccato
     if (await checkIfBlocked(author)) {
       alert("Il tuo account è stato bloccato dall'amministratore. Non puoi commentare.");
       return;
@@ -961,7 +954,7 @@
       await postRef.update({ comments: comments });
     } catch (e) {
       console.error("Errore durante l'eliminazione del commento:", e);
-      alert("Impossibile eliminare commento.");
+      alert("Impossibile eliminare il commento.");
     }
   }
 
