@@ -57,7 +57,6 @@
     font-size: 1.05rem; 
   }
 
-  /* Pulsante Mail Admin */
   .admin-mail-btn {
     position: absolute;
     top: 15px;
@@ -71,7 +70,7 @@
     font-size: 0.85rem;
     cursor: pointer;
     box-shadow: 0 0 10px rgba(245, 158, 11, 0.5);
-    display: none; /* Visibile solo per Fronte ★ */
+    display: none;
   }
 
   .add-post-form {
@@ -187,7 +186,7 @@
     flex-wrap: wrap;
   }
 
-  .like-btn, .comment-toggle-btn, .report-btn {
+  .like-btn, .comment-toggle-btn, .report-btn, .comment-like-btn {
     background: rgba(2, 132, 199, 0.5);
     border: 1px solid #7dd3fc;
     color: #ffffff;
@@ -205,10 +204,6 @@
     background: rgba(245, 158, 11, 0.2);
     border-color: #fde047;
     color: #fef08a;
-  }
-
-  .report-btn:hover {
-    background: rgba(245, 158, 11, 0.5);
   }
 
   .comments-section {
@@ -260,7 +255,6 @@
     font-size: 0.85rem;
   }
 
-  /* Modale Mail Segnalazioni per Admin */
   .modal-overlay {
     position: fixed;
     top: 0; left: 0; width: 100%; height: 100%;
@@ -357,7 +351,6 @@
   <footer>Giornale Dei Gamer · Tutti i diritti riservati</footer>
 </div>
 
-<!-- Modale Segnalazioni Admin -->
 <div class="modal-overlay" id="reportsModal">
   <div class="modal-box">
     <div class="modal-header">
@@ -409,7 +402,27 @@
     return isFronte || (userUid === SUPER_ADMIN_UID);
   }
 
-  // Inizializzazione pagina e caricamento dati
+  // Funzione helper per accreditare o scalare i GDGCoin all'autore del post/commento
+  async function changeUserCoins(authorUsername, deltaAmount) {
+    if (!authorUsername) return;
+    const cleanUser = authorUsername.trim().toLowerCase();
+    const userDocRef = db.collection('users').doc(cleanUser);
+
+    try {
+      await db.runTransaction(async (transaction) => {
+        const doc = await transaction.get(userDocRef);
+        let currentCoins = 0;
+        if (doc.exists) {
+          currentCoins = doc.data().gdgcoin || 0;
+        }
+        const newCoins = Math.max(0, currentCoins + deltaAmount);
+        transaction.set(userDocRef, { gdgcoin: newCoins }, { merge: true });
+      });
+    } catch (e) {
+      console.error("Errore aggiornamento GDGCoin:", e);
+    }
+  }
+
   window.addEventListener('DOMContentLoaded', () => {
     if (isUserAdmin()) {
       const mailBtn = document.getElementById('adminMailBtn');
@@ -418,7 +431,6 @@
     }
   });
 
-  // Ascolto in tempo reale dei Post
   db.collection('posts').onSnapshot((snapshot) => {
     const container = document.getElementById('postsContainer');
     container.innerHTML = '';
@@ -429,7 +441,8 @@
     }
 
     const loggedUser = getLoggedUser();
-    const likedPostsKey = loggedUser ? ('gdg_liked_posts_' + loggedUser.trim().toLowerCase()) : '';
+    const cleanLogged = loggedUser ? loggedUser.trim().toLowerCase() : '';
+    const likedPostsKey = loggedUser ? ('gdg_liked_posts_' + cleanLogged) : '';
     const likedPosts = loggedUser ? (JSON.parse(localStorage.getItem(likedPostsKey)) || []) : [];
     const isAdmin = isUserAdmin();
 
@@ -465,7 +478,7 @@
         <p>${post.content}</p>
 
         <div class="post-actions">
-          <button class="like-btn" style="${likeBtnStyle}" onclick="addLike('${postId}', ${post.likes || 0})">
+          <button class="like-btn" style="${likeBtnStyle}" onclick="addLike('${postId}', ${post.likes || 0}, '${(post.author || '').replace(/'/g, "\\'")}')">
             👍 <span>${post.likes || 0}</span>
           </button>
           <button class="comment-toggle-btn" onclick="toggleComments('${postId}')">
@@ -491,7 +504,189 @@
     });
   });
 
-  // Funzione per Segnalare un Post
+  function renderComments(comments, postId, loggedUser, isAdmin) {
+    if (comments.length === 0) {
+      return '<p style="font-size:0.8rem; color:#bae6fd; margin:4px 0;">Nessun commento ancora.</p>';
+    }
+    
+    const cleanLogged = loggedUser ? loggedUser.trim().toLowerCase() : '';
+    const likedCommentsKey = loggedUser ? ('gdg_liked_comments_' + cleanLogged) : '';
+    const likedComments = loggedUser ? (JSON.parse(localStorage.getItem(likedCommentsKey)) || []) : [];
+
+    return comments.map((c, index) => {
+      const commentUid = `${postId}_${index}`;
+      const hasLikedComment = likedComments.includes(commentUid);
+      const commentLikeBtnStyle = hasLikedComment
+        ? "background: rgba(56, 189, 248, 0.85); border-color: #ffffff;"
+        : "background: rgba(2, 132, 199, 0.4);";
+
+      let deleteCommentBtn = '';
+      if (loggedUser && (loggedUser === c.author || isAdmin)) {
+        deleteCommentBtn = `<button onclick="deleteComment('${postId}', ${index})" style="background: none; border: none; color: #fca5a5; cursor: pointer; font-size: 0.8rem; float: right;" title="Elimina commento">❌</button>`;
+      }
+
+      return `
+        <div class="comment-item">
+          ${deleteCommentBtn}
+          <div class="comment-author">${c.author}</div>
+          <div>${c.text}</div>
+          <div style="margin-top:4px;">
+            <button class="comment-like-btn" style="${commentLikeBtnStyle} font-size:0.75rem; padding:2px 8px;" onclick="addCommentLike('${postId}', ${index}, '${(c.author || '').replace(/'/g, "\\'")}')">
+              👍 <span>${c.likes || 0}</span>
+            </button>
+          </div>
+        </div>
+      `;
+    }).join('');
+  }
+
+  async function createNewPost() {
+    const author = getLoggedUser();
+    if (!author) {
+      alert("Devi prima accedere con il tuo account per pubblicare un post!");
+      window.location.href = "account.html";
+      return;
+    }
+
+    const title = document.getElementById('postTitle').value.trim();
+    const content = document.getElementById('postContent').value.trim();
+    const imageUrl = document.getElementById('postImageUrl').value.trim();
+
+    if (!title || !content) {
+      alert("Inserisci sia il titolo che il testo del post!");
+      return;
+    }
+
+    try {
+      await db.collection('posts').add({
+        title: title,
+        content: content,
+        imageUrl: imageUrl,
+        author: author,
+        likes: 0,
+        comments: [],
+        timestamp: firebase.firestore.FieldValue.serverTimestamp()
+      });
+
+      document.getElementById('postTitle').value = '';
+      document.getElementById('postContent').value = '';
+      document.getElementById('postImageUrl').value = '';
+    } catch (e) {
+      console.error("Errore durante la pubblicazione:", e);
+      alert("Errore durante la pubblicazione.");
+    }
+  }
+
+  // Gestione Like Post (+5 GDGCoin)
+  async function addLike(postId, currentLikes, postAuthor) {
+    const loggedUser = getLoggedUser();
+    if (!loggedUser) {
+      alert("Devi accedere per mettere un like!");
+      window.location.href = "account.html";
+      return;
+    }
+
+    const cleanLogged = loggedUser.trim().toLowerCase();
+    const likedPostsKey = 'gdg_liked_posts_' + cleanLogged;
+    let likedPosts = JSON.parse(localStorage.getItem(likedPostsKey)) || [];
+    const postRef = db.collection('posts').doc(postId);
+
+    try {
+      if (likedPosts.includes(postId)) {
+        likedPosts = likedPosts.filter(id => id !== postId);
+        const newLikes = Math.max(0, currentLikes - 1);
+        await postRef.update({ likes: newLikes });
+        await changeUserCoins(postAuthor, -5);
+      } else {
+        likedPosts.push(postId);
+        const newLikes = currentLikes + 1;
+        await postRef.update({ likes: newLikes });
+        await changeUserCoins(postAuthor, 5);
+      }
+
+      localStorage.setItem(likedPostsKey, JSON.stringify(likedPosts));
+    } catch (e) {
+      console.error("Errore gestione like post:", e);
+    }
+  }
+
+  // Gestione Like Commento (+5 GDGCoin)
+  async function addCommentLike(postId, commentIndex, commentAuthor) {
+    const loggedUser = getLoggedUser();
+    if (!loggedUser) {
+      alert("Devi accedere per mettere un like ai commenti!");
+      window.location.href = "account.html";
+      return;
+    }
+
+    const cleanLogged = loggedUser.trim().toLowerCase();
+    const likedCommentsKey = 'gdg_liked_comments_' + cleanLogged;
+    let likedComments = JSON.parse(localStorage.getItem(likedCommentsKey)) || [];
+    const commentUid = `${postId}_${commentIndex}`;
+
+    try {
+      const postRef = db.collection('posts').doc(postId);
+      const doc = await postRef.get();
+
+      if (doc.exists) {
+        let comments = doc.data().comments || [];
+        if (!comments[commentIndex]) return;
+
+        let currentCommentLikes = comments[commentIndex].likes || 0;
+
+        if (likedComments.includes(commentUid)) {
+          likedComments = likedComments.filter(id => id !== commentUid);
+          comments[commentIndex].likes = Math.max(0, currentCommentLikes - 1);
+          await postRef.update({ comments: comments });
+          await changeUserCoins(commentAuthor, -5);
+        } else {
+          likedComments.push(commentUid);
+          comments[commentIndex].likes = currentCommentLikes + 1;
+          await postRef.update({ comments: comments });
+          await changeUserCoins(commentAuthor, 5);
+        }
+
+        localStorage.setItem(likedCommentsKey, JSON.stringify(likedComments));
+      }
+    } catch (e) {
+      console.error("Errore gestione like commento:", e);
+    }
+  }
+
+  async function addComment(postId) {
+    const author = getLoggedUser();
+    if (!author) {
+      alert("Devi accedere per poter commentare!");
+      window.location.href = "account.html";
+      return;
+    }
+
+    const input = document.getElementById(`inputComment-${postId}`);
+    const text = input.value.trim();
+
+    if (!text) return;
+
+    try {
+      const postRef = db.collection('posts').doc(postId);
+      const doc = await postRef.get();
+
+      if (doc.exists) {
+        const currentComments = doc.data().comments || [];
+        currentComments.push({
+          author: author,
+          text: text,
+          likes: 0,
+          date: new Date().toISOString()
+        });
+
+        await postRef.update({ comments: currentComments });
+        input.value = '';
+      }
+    } catch (e) {
+      console.error("Errore inserimento commento: ", e);
+    }
+  }
+
   async function reportPost(postId, postTitle) {
     const loggedUser = getLoggedUser();
     if (!loggedUser) {
@@ -519,7 +714,6 @@
     }
   }
 
-  // Ascolto in tempo reale delle Segnalazioni (Solo per Admin)
   function listenToReports() {
     db.collection('reports').onSnapshot((snapshot) => {
       const mailBtn = document.getElementById('adminMailBtn');
@@ -577,132 +771,12 @@
   function openReportsModal() { document.getElementById('reportsModal').style.display = 'flex'; }
   function closeReportsModal() { document.getElementById('reportsModal').style.display = 'none'; }
 
-  function renderComments(comments, postId, loggedUser, isAdmin) {
-    if (comments.length === 0) {
-      return '<p style="font-size:0.8rem; color:#bae6fd; margin:4px 0;">Nessun commento ancora.</p>';
-    }
-    
-    return comments.map((c, index) => {
-      let deleteCommentBtn = '';
-      if (loggedUser && (loggedUser === c.author || isAdmin)) {
-        deleteCommentBtn = `<button onclick="deleteComment('${postId}', ${index})" style="background: none; border: none; color: #fca5a5; cursor: pointer; font-size: 0.8rem; float: right;" title="Elimina commento">❌</button>`;
-      }
-
-      return `
-        <div class="comment-item">
-          ${deleteCommentBtn}
-          <div class="comment-author">${c.author}</div>
-          <div>${c.text}</div>
-        </div>
-      `;
-    }).join('');
-  }
-
-  async function createNewPost() {
-    const author = getLoggedUser();
-    if (!author) {
-      alert("Devi prima accedere con il tuo account per pubblicare un post!");
-      window.location.href = "account.html";
-      return;
-    }
-
-    const title = document.getElementById('postTitle').value.trim();
-    const content = document.getElementById('postContent').value.trim();
-    const imageUrl = document.getElementById('postImageUrl').value.trim();
-
-    if (!title || !content) {
-      alert("Inserisci sia il titolo che il testo del post!");
-      return;
-    }
-
-    try {
-      await db.collection('posts').add({
-        title: title,
-        content: content,
-        imageUrl: imageUrl,
-        author: author,
-        likes: 0,
-        comments: [],
-        timestamp: firebase.firestore.FieldValue.serverTimestamp()
-      });
-
-      document.getElementById('postTitle').value = '';
-      document.getElementById('postContent').value = '';
-      document.getElementById('postImageUrl').value = '';
-    } catch (e) {
-      console.error("Errore durante l'invio del post: ", e);
-      alert("Errore durante la pubblicazione.");
-    }
-  }
-
-  async function addLike(postId, currentLikes) {
-    const loggedUser = getLoggedUser();
-    if (!loggedUser) {
-      alert("Devi accedere con il tuo account per mettere un like!");
-      window.location.href = "account.html";
-      return;
-    }
-
-    const likedPostsKey = 'gdg_liked_posts_' + loggedUser.trim().toLowerCase();
-    let likedPosts = JSON.parse(localStorage.getItem(likedPostsKey)) || [];
-    const postRef = db.collection('posts').doc(postId);
-
-    try {
-      if (likedPosts.includes(postId)) {
-        likedPosts = likedPosts.filter(id => id !== postId);
-        const newLikes = Math.max(0, currentLikes - 1);
-        await postRef.update({ likes: newLikes });
-      } else {
-        likedPosts.push(postId);
-        const newLikes = currentLikes + 1;
-        await postRef.update({ likes: newLikes });
-      }
-
-      localStorage.setItem(likedPostsKey, JSON.stringify(likedPosts));
-    } catch (e) {
-      console.error("Errore durante la gestione del like:", e);
-    }
-  }
-
   function toggleComments(postId) {
     const el = document.getElementById(`comments-${postId}`);
     if (el.style.display === 'block') {
       el.style.display = 'none';
     } else {
       el.style.display = 'block';
-    }
-  }
-
-  async function addComment(postId) {
-    const author = getLoggedUser();
-    if (!author) {
-      alert("Devi accedere per poter commentare!");
-      window.location.href = "account.html";
-      return;
-    }
-
-    const input = document.getElementById(`inputComment-${postId}`);
-    const text = input.value.trim();
-
-    if (!text) return;
-
-    try {
-      const postRef = db.collection('posts').doc(postId);
-      const doc = await postRef.get();
-
-      if (doc.exists) {
-        const currentComments = doc.data().comments || [];
-        currentComments.push({
-          author: author,
-          text: text,
-          date: new Date().toISOString()
-        });
-
-        await postRef.update({ comments: currentComments });
-        input.value = '';
-      }
-    } catch (e) {
-      console.error("Errore inserimento commento: ", e);
     }
   }
 
