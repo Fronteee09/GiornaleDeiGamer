@@ -147,14 +147,36 @@
     border-radius: 12px;
     padding: 16px;
     position: relative;
-    transition: border 0.3s ease;
+  }
+
+  .post-header-line {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 6px;
   }
 
   .post-author {
     font-size: 0.85rem;
     color: #7dd3fc;
-    margin-bottom: 6px;
     font-weight: bold;
+  }
+
+  .block-user-btn {
+    background: rgba(239, 68, 68, 0.2);
+    border: 1px solid #fca5a5;
+    color: #fca5a5;
+    padding: 2px 8px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.75rem;
+    font-weight: bold;
+    display: none; /* Visibile solo per l'admin */
+  }
+
+  .block-user-btn:hover {
+    background: rgba(239, 68, 68, 0.5);
+    color: white;
   }
 
   .post-card h3 {
@@ -223,6 +245,12 @@
     position: relative;
   }
 
+  .comment-header-line {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
   .comment-author {
     font-weight: bold;
     color: #bae6fd;
@@ -276,7 +304,6 @@
     display: flex;
     flex-direction: column;
     padding: 20px;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.8);
   }
 
   .modal-header {
@@ -325,13 +352,14 @@
     <button id="adminMailBtn" class="admin-mail-btn" onclick="openReportsModal()">✉️ Mail (0)</button>
     <h1>Minecraft Community</h1>
     <p>Condividi idee, costruzioni e commenti con gli altri gamer.</p>
+    <div style="margin-top:8px;"><a href="visualizzacommunity.html" style="color:#7dd3fc; font-size:0.9rem;">← Torna alle Community</a></div>
   </header>
 
   <div class="glass">
     <div class="add-post-form">
       <input type="text" id="postTitle" class="input-field" placeholder="Titolo del post..." required>
       <textarea id="postContent" class="input-field" placeholder="Scrivi il tuo messaggio..." required></textarea>
-      <input type="text" id="postImageUrl" class="input-field" placeholder="URL Immagine (opzionale, es: https://...)">
+      <input type="text" id="postImageUrl" class="input-field" placeholder="URL Immagine (es. https://.../foto.jpg - Solo immagini statiche)">
       <button class="submit-btn" onclick="createNewPost()">Pubblica Post</button>
     </div>
 
@@ -345,7 +373,7 @@
   </div>
 
   <div class="back-container">
-    <a class="btn" href="index.html">Torna alla Home</a>
+    <a class="btn" href="visualizzacommunity.html">Torna alle Community</a>
   </div>
 
   <footer>Giornale Dei Gamer · Tutti i diritti riservati</footer>
@@ -402,7 +430,62 @@
     return isFronte || (userUid === SUPER_ADMIN_UID);
   }
 
-  // Funzione helper per accreditare o scalare i GDGCoin all'autore del post/commento
+  // Funzione per verificare se un utente è bloccato
+  async function checkIfBlocked(username) {
+    if (!username) return false;
+    try {
+      const doc = await db.collection('blocked_users').doc(username.trim().toLowerCase()).get();
+      return doc.exists;
+    } catch(e) {
+      return false;
+    }
+  }
+
+  // Funzione Admin per bloccare/sbloccare un utente
+  async function toggleBlockUser(username) {
+    if (!isUserAdmin()) return;
+    const targetKey = username.trim().toLowerCase();
+    const docRef = db.collection('blocked_users').doc(targetKey);
+
+    try {
+      const doc = await docRef.get();
+      if (doc.exists) {
+        if (confirm(`Vuoi sbloccare l'utente ${username}?`)) {
+          await docRef.delete();
+          alert(`Utente ${username} sbloccato.`);
+        }
+      } else {
+        if (confirm(`ATTENZIONE: Vuoi bloccare l'utente ${username}? Non potrà più postare o commentare.`)) {
+          await docRef.set({ blockedBy: getLoggedUser(), timestamp: firebase.firestore.FieldValue.serverTimestamp() });
+          alert(`Utente ${username} bloccato con successo.`);
+        }
+      }
+    } catch(e) {
+      console.error("Errore blocco utente:", e);
+    }
+  }
+
+  // Filtro rigoroso per accettare solo immagini statiche (no GIF, no siti web, no video)
+  function isValidImageUrl(url) {
+    if (!url) return true; // Se è vuoto è opzionale, quindi valido
+    const cleanUrl = url.toLowerCase().trim();
+    
+    // Controlla estensioni per sole immagini fisse
+    const hasValidExtension = cleanUrl.endsWith('.jpg') || 
+                              cleanUrl.endsWith('.jpeg') || 
+                              cleanUrl.endsWith('.png') || 
+                              cleanUrl.endsWith('.webp');
+                              
+    // Esclude esplicitamente gif, video o link generici
+    const isGifOrVideo = cleanUrl.includes('.gif') || 
+                         cleanUrl.includes('.mp4') || 
+                         cleanUrl.includes('.webm') || 
+                         cleanUrl.includes('youtube.com') || 
+                         cleanUrl.includes('youtu.be');
+
+    return hasValidExtension && !isGifOrVideo;
+  }
+
   async function changeUserCoins(authorUsername, deltaAmount) {
     if (!authorUsername) return;
     const cleanUser = authorUsername.trim().toLowerCase();
@@ -470,9 +553,17 @@
         deletePostBtn = `<button onclick="deletePost('${postId}')" style="background: rgba(239,68,68,0.6); border: 1px solid #fca5a5; color: white; padding: 4px 10px; border-radius: 6px; cursor: pointer; float: right; font-size: 0.8rem;">🗑️ Elimina Post</button>`;
       }
 
+      let blockAuthorBtn = '';
+      if (isAdmin && post.author) {
+        blockAuthorBtn = `<button class="block-user-btn" style="display:inline-block;" onclick="toggleBlockUser('${post.author.replace(/'/g, "\\'")}')">🚫 Blocca Utente</button>`;
+      }
+
       card.innerHTML = `
         ${deletePostBtn}
-        <div class="post-author">👤 ${post.author || 'Anonimo'}</div>
+        <div class="post-header-line">
+          <div class="post-author">👤 ${post.author || 'Anonimo'}</div>
+          ${blockAuthorBtn}
+        </div>
         <h3>${post.title}</h3>
         ${imageHtml}
         <p>${post.content}</p>
@@ -525,10 +616,18 @@
         deleteCommentBtn = `<button onclick="deleteComment('${postId}', ${index})" style="background: none; border: none; color: #fca5a5; cursor: pointer; font-size: 0.8rem; float: right;" title="Elimina commento">❌</button>`;
       }
 
+      let blockCommentAuthorBtn = '';
+      if (isAdmin && c.author) {
+        blockCommentAuthorBtn = `<button class="block-user-btn" style="display:inline-block; font-size:0.65rem; padding:1px 6px;" onclick="toggleBlockUser('${c.author.replace(/'/g, "\\'")}')">🚫 Blocca</button>`;
+      }
+
       return `
         <div class="comment-item">
           ${deleteCommentBtn}
-          <div class="comment-author">${c.author}</div>
+          <div class="comment-header-line">
+            <div class="comment-author">${c.author}</div>
+            ${blockCommentAuthorBtn}
+          </div>
           <div>${c.text}</div>
           <div style="margin-top:4px;">
             <button class="comment-like-btn" style="${commentLikeBtnStyle} font-size:0.75rem; padding:2px 8px;" onclick="addCommentLike('${postId}', ${index}, '${(c.author || '').replace(/'/g, "\\'")}')">
@@ -548,12 +647,24 @@
       return;
     }
 
+    // Controllo se l'utente è bloccato
+    if (await checkIfBlocked(author)) {
+      alert("Il tuo account è stato bloccato dall'amministratore. Non puoi pubblicare post.");
+      return;
+    }
+
     const title = document.getElementById('postTitle').value.trim();
     const content = document.getElementById('postContent').value.trim();
     const imageUrl = document.getElementById('postImageUrl').value.trim();
 
     if (!title || !content) {
       alert("Inserisci sia il titolo che il testo del post!");
+      return;
+    }
+
+    // Validazione rigorosa dell'immagine (solo immagini fisse, no GIF/video/siti web)
+    if (!isValidImageUrl(imageUrl)) {
+      alert("Link non valido! Puoi inserire solo link di immagini statiche (terminanti in .jpg, .jpeg, .png, .webp). Niente GIF, video o siti web.");
       return;
     }
 
@@ -572,12 +683,11 @@
       document.getElementById('postContent').value = '';
       document.getElementById('postImageUrl').value = '';
     } catch (e) {
-      console.error("Errore durante la pubblicazione:", e);
+      console.error("Errore pubblicazione:", e);
       alert("Errore durante la pubblicazione.");
     }
   }
 
-  // Gestione Like Post (+5 GDGCoin)
   async function addLike(postId, currentLikes, postAuthor) {
     const loggedUser = getLoggedUser();
     if (!loggedUser) {
@@ -610,7 +720,6 @@
     }
   }
 
-  // Gestione Like Commento (+5 GDGCoin)
   async function addCommentLike(postId, commentIndex, commentAuthor) {
     const loggedUser = getLoggedUser();
     if (!loggedUser) {
@@ -658,6 +767,12 @@
     if (!author) {
       alert("Devi accedere per poter commentare!");
       window.location.href = "account.html";
+      return;
+    }
+
+    // Controllo se l'utente è bloccato
+    if (await checkIfBlocked(author)) {
+      alert("Il tuo account è stato bloccato dall'amministratore. Non puoi commentare.");
       return;
     }
 
@@ -846,7 +961,7 @@
       await postRef.update({ comments: comments });
     } catch (e) {
       console.error("Errore durante l'eliminazione del commento:", e);
-      alert("Impossibile eliminare il commento.");
+      alert("Impossibile eliminare commento.");
     }
   }
 
