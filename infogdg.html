@@ -1,0 +1,499 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>InfoGiornaleDeiGamer · Giornale Dei Gamer</title>
+<link rel="icon" href="logo2.jpg">
+<style>
+  * { box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; }
+  body {
+    margin: 0;
+    min-height: 100vh;
+    font-family: "Segoe UI", system-ui, -apple-system, Roboto, sans-serif;
+    color: #e0f2fe;
+    line-height: 1.6;
+    overflow-x: hidden;
+    background: linear-gradient(135deg, #0f172a 0%, #0c4a6e 100%);
+  }
+
+  .wrap { 
+    width: 100%; 
+    max-width: 760px; 
+    margin: 0 auto; 
+    padding: 18px; 
+  }
+
+  .glass {
+    background: rgba(12, 74, 110, 0.75);
+    border: 1px solid rgba(125, 211, 252, 0.45);
+    border-radius: 16px;
+    box-shadow: 0 8px 28px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(224, 242, 254, 0.5);
+    -webkit-backdrop-filter: blur(12px);
+    backdrop-filter: blur(12px);
+    padding: 20px;
+    margin-bottom: 18px;
+    position: relative;
+  }
+
+  header.glass { 
+    margin-top: 24px; 
+    text-align: center; 
+    padding: 30px 20px; 
+  }
+
+  h1 {
+    margin: 0 0 10px;
+    font-size: clamp(1.6rem, 6vw, 2.6rem);
+    line-height: 1.1;
+    color: #ffffff;
+    text-shadow: 0 0 16px rgba(56, 189, 248, 0.9);
+  }
+
+  header p { 
+    margin: 0; 
+    color: #bae6fd; 
+    font-size: 1rem; 
+  }
+
+  .admin-mail-btn {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    background: linear-gradient(180deg, #f59e0b 0%, #d97706 100%);
+    border: 1px solid #fef3c7;
+    color: white;
+    padding: 6px 14px;
+    border-radius: 999px;
+    font-weight: bold;
+    font-size: 0.85rem;
+    cursor: pointer;
+    box-shadow: 0 0 10px rgba(245, 158, 11, 0.5);
+    display: none;
+  }
+
+  .user-support-btn {
+    display: inline-block;
+    margin-top: 12px;
+    background: rgba(2, 132, 199, 0.5);
+    border: 1px solid #7dd3fc;
+    color: #ffffff;
+    padding: 8px 16px;
+    border-radius: 999px;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 0.9rem;
+  }
+
+  .user-support-btn:hover {
+    background: rgba(2, 132, 199, 0.8);
+  }
+
+  .add-post-form {
+    display: none;
+    flex-direction: column;
+    gap: 10px;
+    margin-bottom: 20px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid rgba(125, 211, 252, 0.3);
+  }
+
+  .input-field {
+    width: 100%;
+    padding: 10px 14px;
+    border-radius: 8px;
+    border: 1px solid #7dd3fc;
+    background: rgba(255, 255, 255, 0.95);
+    color: #0f172a;
+    font-size: 0.95rem;
+    outline: none;
+  }
+
+  textarea.input-field {
+    resize: vertical;
+    min-height: 80px;
+  }
+
+  .submit-btn {
+    align-self: flex-start;
+    padding: 8px 20px;
+    border-radius: 999px;
+    border: 1px solid #7dd3fc;
+    background: linear-gradient(180deg, #38bdf8 0%, #0284c7 100%);
+    color: white;
+    font-weight: 600;
+    cursor: pointer;
+    box-shadow: 0 0 10px rgba(56, 189, 248, 0.4);
+  }
+
+  .scroll-box {
+    max-height: 550px;
+    overflow-y: auto;
+    padding-right: 6px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .post-card {
+    background: rgba(7, 59, 92, 0.85);
+    border: 1px solid rgba(125, 211, 252, 0.3);
+    border-radius: 12px;
+    padding: 16px;
+    position: relative;
+  }
+
+  .post-badge {
+    display: inline-block;
+    background: #0284c7;
+    color: white;
+    font-size: 0.75rem;
+    font-weight: bold;
+    padding: 2px 8px;
+    border-radius: 4px;
+    margin-bottom: 8px;
+  }
+
+  .post-card h3 {
+    margin: 0 0 8px;
+    font-size: 1.15rem;
+    color: #ffffff;
+  }
+
+  .post-card p {
+    margin: 0 0 10px;
+    color: #e0f2fe;
+    font-size: 0.95rem;
+    white-space: pre-line;
+  }
+
+  .post-img {
+    width: 100%;
+    max-height: 280px;
+    object-fit: cover;
+    border-radius: 8px;
+    margin-bottom: 12px;
+    border: 1px solid rgba(125, 211, 252, 0.4);
+  }
+
+  .modal-overlay {
+    position: fixed;
+    top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(0,0,0,0.75);
+    display: none;
+    justify-content: center;
+    align-items: center;
+    z-index: 999;
+    padding: 20px;
+  }
+
+  .modal-box {
+    background: #0c4a6e;
+    border: 2px solid #7dd3fc;
+    border-radius: 16px;
+    width: 100%;
+    max-width: 500px;
+    max-height: 80vh;
+    display: flex;
+    flex-direction: column;
+    padding: 20px;
+  }
+
+  .modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #7dd3fc;
+    padding-bottom: 10px;
+    margin-bottom: 15px;
+  }
+
+  .modal-header h2 { margin: 0; font-size: 1.2rem; color: #fff; }
+  .close-modal { background: none; border: none; color: #fca5a5; font-size: 1.4rem; cursor: pointer; }
+
+  .mail-list {
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .mail-item {
+    background: rgba(7, 59, 92, 0.9);
+    border: 1px solid #7dd3fc;
+    border-radius: 8px;
+    padding: 10px;
+    font-size: 0.85rem;
+  }
+
+  .back-container { text-align: center; margin-top: 10px; margin-bottom: 20px; }
+  .btn {
+    display: inline-block; padding: 10px 24px; color: #ffffff; font-weight: 600;
+    text-decoration: none; border: 1px solid #7dd3fc; border-radius: 999px;
+    background: linear-gradient(180deg, #38bdf8 0%, #0284c7 100%);
+  }
+  footer { text-align: center; color: #7dd3fc; font-size: .9rem; padding: 10px 0 30px; }
+</style>
+
+<script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore-compat.js"></script>
+</head>
+<body>
+
+<div class="wrap">
+  <header class="glass">
+    <button id="adminMailBtn" class="admin-mail-btn" onclick="openMailModal()">📬 Mail Supporto (0)</button>
+    <h1>InfoGiornaleDeiGamer</h1>
+    <p>Canale ufficiale degli annunci e del supporto clienti.</p>
+    <button class="user-support-btn" onclick="sendSupportMessage()">📩 Scrivi all'Admin</button>
+  </header>
+
+  <div class="glass">
+    <!-- Form di creazione post visibile solo per l'Admin -->
+    <div class="add-post-form" id="adminPostForm">
+      <h3 style="margin:0 0 10px; color:#fff;">📢 Pubblica Comunicato Ufficiale</h3>
+      <input type="text" id="postTitle" class="input-field" placeholder="Titolo dell'annuncio o della risposta..." required>
+      <textarea id="postContent" class="input-field" placeholder="Scrivi il contenuto dell'annuncio..." required></textarea>
+      <input type="text" id="postImageUrl" class="input-field" placeholder="URL Immagine (opzionale)">
+      <button class="submit-btn" onclick="createNewNotice()">Pubblica Annuncio</button>
+    </div>
+
+    <!-- Lista Annunci -->
+    <div class="scroll-box" id="noticesContainer">
+      <p style="text-align:center;">Caricamento comunicati...</p>
+    </div>
+  </div>
+
+  <div class="back-container">
+    <a class="btn" href="community.html">← Torna alle Community</a>
+  </div>
+
+  <footer>Giornale Dei Gamer · Tutti i diritti riservati</footer>
+</div>
+
+<!-- Modale Mail Supporto Admin -->
+<div class="modal-overlay" id="mailModal">
+  <div class="modal-box">
+    <div class="modal-header">
+      <h2>📬 Messaggi dagli Utenti</h2>
+      <button class="close-modal" onclick="closeMailModal()">✖</button>
+    </div>
+    <div class="mail-list" id="mailList">
+      <p style="text-align:center;">Nessun messaggio in arrivo.</p>
+    </div>
+  </div>
+</div>
+
+<script>
+  const firebaseConfig = {
+    apiKey: "AIzaSyDSv5h11knmaS2CaJFTpgN6lTxEYptksRk",
+    authDomain: "giornaledeigamer---social.firebaseapp.com",
+    projectId: "giornaledeigamer---social",
+    storageBucket: "giornaledeigamer---social.firebasestorage.app",
+    messagingSenderId: "490970879261",
+    appId: "1:490970879261:web:00bb9ace1800dd8dbe7df4",
+    measurementId: "G-4K0NXCRDRL"
+  };
+
+  firebase.initializeApp(firebaseConfig);
+  const db = firebase.firestore();
+
+  const SUPER_ADMIN_UID = "2NjFn7umG1RszA2dciMsr5H1f7z2";
+
+  function getLoggedUser() {
+    return localStorage.getItem('gdg_logged_user');
+  }
+
+  function isUserAdmin() {
+    const loggedUser = getLoggedUser();
+    if (!loggedUser) return false;
+
+    const cleanLogged = loggedUser.trim().toLowerCase();
+    const isFronte = cleanLogged === 'fronte ★' || cleanLogged === 'fronte';
+
+    const userKey = 'gdg_user_' + cleanLogged;
+    const userDataJson = localStorage.getItem(userKey);
+    let userUid = '';
+    
+    if (userDataJson) {
+      const userData = JSON.parse(userDataJson);
+      userUid = userData.uid || '';
+    }
+
+    return isFronte || (userUid === SUPER_ADMIN_UID);
+  }
+
+  window.addEventListener('DOMContentLoaded', () => {
+    if (isUserAdmin()) {
+      document.getElementById('adminPostForm').style.display = 'flex';
+      const mailBtn = document.getElementById('adminMailBtn');
+      mailBtn.style.display = 'block';
+      listenToSupportMails();
+    }
+  });
+
+  // Caricamento in tempo reale dei comunicati
+  db.collection('info_notices').orderBy('timestamp', 'desc').onSnapshot((snapshot) => {
+    const container = document.getElementById('noticesContainer');
+    container.innerHTML = '';
+
+    if (snapshot.empty) {
+      container.innerHTML = '<p style="text-align:center;">Nessun comunicato ufficiale presente.</p>';
+      return;
+    }
+
+    const isAdmin = isUserAdmin();
+
+    snapshot.forEach((doc) => {
+      const notice = doc.data();
+      const noticeId = doc.id;
+
+      const card = document.createElement('div');
+      card.className = 'post-card';
+
+      let imageHtml = '';
+      if (notice.imageUrl) {
+        imageHtml = `<img class="post-img" src="${notice.imageUrl}" alt="Immagine annuncio" onerror="this.style.display='none'">`;
+      }
+
+      let deleteBtn = '';
+      if (isAdmin) {
+        deleteBtn = `<button onclick="deleteNotice('${noticeId}')" style="background: rgba(239,68,68,0.6); border: 1px solid #fca5a5; color: white; padding: 4px 10px; border-radius: 6px; cursor: pointer; float: right; font-size: 0.8rem;">🗑️ Elimina</button>`;
+      }
+
+      card.innerHTML = `
+        ${deleteBtn}
+        <span class="post-badge">UFFICIALE</span>
+        <h3>${notice.title}</h3>
+        ${imageHtml}
+        <p>${notice.content}</p>
+        <div style="font-size:0.75rem; color:#7dd3fc; margin-top:6px;">Pubblicato da: ${notice.author}</div>
+      `;
+
+      container.appendChild(card);
+    });
+  });
+
+  // Invio messaggio di supporto da parte degli utenti
+  async function sendSupportMessage() {
+    const loggedUser = getLoggedUser();
+    if (!loggedUser) {
+      alert("Devi prima accedere con il tuo account per inviare un messaggio di supporto!");
+      window.location.href = "account.html";
+      return;
+    }
+
+    const problemText = prompt("Descrivi il problema o fai la tua domanda all'Admin:");
+    if (!problemText || !problemText.trim()) return;
+
+    try {
+      await db.collection('support_mails').add({
+        user: loggedUser,
+        message: problemText.trim(),
+        timestamp: firebase.firestore.FieldValue.serverTimestamp()
+      });
+
+      alert("Messaggio inviato con successo! L'Admin pubblicherà un annuncio di risposta al più presto.");
+    } catch (e) {
+      console.error("Errore invio messaggio: ", e);
+      alert("Impossibile inviare il messaggio.");
+    }
+  }
+
+  // Creazione nuovo annuncio ufficiale (solo Admin)
+  async function createNewNotice() {
+    if (!isUserAdmin()) return;
+
+    const title = document.getElementById('postTitle').value.trim();
+    const content = document.getElementById('postContent').value.trim();
+    const imageUrl = document.getElementById('postImageUrl').value.trim();
+
+    if (!title || !content) {
+      alert("Inserisci titolo e contenuto del comunicato!");
+      return;
+    }
+
+    try {
+      await db.collection('info_notices').add({
+        title: title,
+        content: content,
+        imageUrl: imageUrl,
+        author: getLoggedUser() || "Fronte ★",
+        timestamp: firebase.firestore.FieldValue.serverTimestamp()
+      });
+
+      document.getElementById('postTitle').value = '';
+      document.getElementById('postContent').value = '';
+      document.getElementById('postImageUrl').value = '';
+    } catch (e) {
+      console.error("Errore pubblicazione: ", e);
+      alert("Errore durante la pubblicazione.");
+    }
+  }
+
+  // Eliminazione annuncio
+  async function deleteNotice(noticeId) {
+    if (!isUserAdmin()) return;
+    if (!confirm("Vuoi davvero eliminare questo comunicato?")) return;
+
+    try {
+      await db.collection('info_notices').doc(noticeId).delete();
+    } catch (e) {
+      console.error("Errore eliminazione: ", e);
+    }
+  }
+
+  // Ascolto messaggi mail per Admin
+  function listenToSupportMails() {
+    db.collection('support_mails').orderBy('timestamp', 'desc').onSnapshot((snapshot) => {
+      const mailBtn = document.getElementById('adminMailBtn');
+      const mailList = document.getElementById('mailList');
+
+      mailBtn.textContent = `📬 Mail Supporto (${snapshot.size})`;
+
+      if (snapshot.empty) {
+        mailList.innerHTML = '<p style="text-align:center; color:#bae6fd;">Nessun messaggio di supporto.</p>';
+        return;
+      }
+
+      mailList.innerHTML = '';
+      snapshot.forEach((doc) => {
+        const mail = doc.data();
+        const mailId = doc.id;
+
+        const div = document.createElement('div');
+        div.className = 'mail-item';
+        div.innerHTML = `
+          <div><strong>Utente:</strong> ${mail.user}</div>
+          <div><strong>Messaggio:</strong> "${mail.message}"</div>
+          <div style="margin-top: 8px; display: flex; gap: 6px;">
+            <button onclick="replyWithPost('${mail.user.replace(/'/g, "\\'")}', '${mail.message.replace(/'/g, "\\'")}', '${mailId}')" style="background:#0284c7; color:white; border:none; padding:4px 8px; border-radius:4px; cursor:pointer; font-size:0.75rem;">💬 Rispondi con Post</button>
+            <button onclick="deleteSupportMail('${mailId}')" style="background:#4b5563; color:white; border:none; padding:4px 8px; border-radius:4px; cursor:pointer; font-size:0.75rem;">Elimina</button>
+          </div>
+        `;
+        mailList.appendChild(div);
+      });
+    });
+  }
+
+  function replyWithPost(user, userMessage, mailId) {
+    closeMailModal();
+    document.getElementById('postTitle').value = `Risposta a ${user}`;
+    document.getElementById('postContent').value = `Domanda di ${user}:\n"${userMessage}"\n\nRisposta:\n`;
+    document.getElementById('adminPostForm').scrollIntoView({ behavior: 'smooth' });
+  }
+
+  async function deleteSupportMail(mailId) {
+    try {
+      await db.collection('support_mails').doc(mailId).delete();
+    } catch (e) {
+      console.error(e);
+    }
+  }
+
+  function openMailModal() { document.getElementById('mailModal').style.display = 'flex'; }
+  function closeMailModal() { document.getElementById('mailModal').style.display = 'none'; }
+</script>
+</body>
+</html>
