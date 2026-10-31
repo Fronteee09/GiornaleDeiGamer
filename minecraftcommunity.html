@@ -462,7 +462,6 @@
     }
   }
 
-  // Filtro immagine aggiornato per gestire i parametri di Reddit (es. ?width=1080...)
   function isValidImageUrl(url) {
     if (!url) return true;
     const cleanUrl = url.toLowerCase().trim();
@@ -510,7 +509,8 @@
     }
   });
 
-  db.collection('posts').onSnapshot((snapshot) => {
+  // Caricamento post ORDINATI DAL PIÙ RECENTE AL PIÙ VECCHIO
+  db.collection('posts').orderBy('timestamp', 'desc').onSnapshot((snapshot) => {
     const container = document.getElementById('postsContainer');
     container.innerHTML = '';
 
