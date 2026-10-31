@@ -250,7 +250,6 @@
   </header>
 
   <div class="glass">
-    <!-- Form di creazione post visibile solo per l'Admin -->
     <div class="add-post-form" id="adminPostForm">
       <h3 style="margin:0 0 10px; color:#fff;">📢 Pubblica Comunicato Ufficiale</h3>
       <input type="text" id="postTitle" class="input-field" placeholder="Titolo dell'annuncio o della risposta..." required>
@@ -259,20 +258,18 @@
       <button class="submit-btn" onclick="createNewNotice()">Pubblica Annuncio</button>
     </div>
 
-    <!-- Lista Annunci -->
     <div class="scroll-box" id="noticesContainer">
       <p style="text-align:center;">Caricamento comunicati...</p>
     </div>
   </div>
 
   <div class="back-container">
-    <a class="btn" href="community.html">← Torna alle Community</a>
+    <a class="btn" href="visualizzacommunity.html">← Torna alle Community</a>
   </div>
 
   <footer>Giornale Dei Gamer · Tutti i diritti riservati</footer>
 </div>
 
-<!-- Modale Mail Supporto Admin -->
 <div class="modal-overlay" id="mailModal">
   <div class="modal-box">
     <div class="modal-header">
@@ -333,7 +330,6 @@
     }
   });
 
-  // Caricamento in tempo reale dei comunicati
   db.collection('info_notices').orderBy('timestamp', 'desc').onSnapshot((snapshot) => {
     const container = document.getElementById('noticesContainer');
     container.innerHTML = '';
@@ -375,7 +371,6 @@
     });
   });
 
-  // Invio messaggio di supporto da parte degli utenti
   async function sendSupportMessage() {
     const loggedUser = getLoggedUser();
     if (!loggedUser) {
@@ -401,7 +396,6 @@
     }
   }
 
-  // Creazione nuovo annuncio ufficiale (solo Admin)
   async function createNewNotice() {
     if (!isUserAdmin()) return;
 
@@ -432,7 +426,6 @@
     }
   }
 
-  // Eliminazione annuncio
   async function deleteNotice(noticeId) {
     if (!isUserAdmin()) return;
     if (!confirm("Vuoi davvero eliminare questo comunicato?")) return;
@@ -444,7 +437,6 @@
     }
   }
 
-  // Ascolto messaggi mail per Admin
   function listenToSupportMails() {
     db.collection('support_mails').orderBy('timestamp', 'desc').onSnapshot((snapshot) => {
       const mailBtn = document.getElementById('adminMailBtn');
