@@ -15,9 +15,7 @@
     color: #e0f2fe;
     line-height: 1.6;
     overflow-x: hidden;
-    background: url('img/sfondominecraft1.png') no-repeat center center fixed;
-    background-size: cover;
-    background-color: #0c4a6e;
+    background: linear-gradient(135deg, #0f172a 0%, #0c4a6e 100%);
   }
 
   .wrap { 
@@ -306,7 +304,7 @@
 </div>
 
 <script>
-  // Configurazione Firebase del tuo progetto
+  // Configurazione Firebase
   const firebaseConfig = {
     apiKey: "AIzaSyDSv5h11knmaS2CaJFTpgN6lTxEYptksRk",
     authDomain: "giornaledeigamer---social.firebaseapp.com",
@@ -320,9 +318,30 @@
   firebase.initializeApp(firebaseConfig);
   const db = firebase.firestore();
 
+  // UID di Admin con permessi di moderazione totale
+  const SUPER_ADMIN_UID = "2NjFn7umG1RszA2dciMsr5H1f7z2";
+
   // Recupera l'utente attualmente loggato da localStorage
   function getLoggedUser() {
     return localStorage.getItem('gdg_logged_user');
+  }
+
+  // Controlla se l'utente corrente ha i permessi da Amministratore Supremo
+  function isUserAdmin() {
+    const loggedUser = getLoggedUser();
+    if (!loggedUser) return false;
+
+    // Recupera i dati utente registrati nel localStorage
+    const userKey = 'gdg_user_' + loggedUser.toLowerCase();
+    const userDataJson = localStorage.getItem(userKey);
+    let userUid = '';
+    
+    if (userDataJson) {
+      const userData = JSON.parse(userDataJson);
+      userUid = userData.uid || '';
+    }
+
+    return (loggedUser.toLowerCase() === 'fronte') || (userUid === SUPER_ADMIN_UID);
   }
 
   // Ascolto in tempo reale dei post su Firestore
@@ -338,6 +357,7 @@
     const loggedUser = getLoggedUser();
     const likedPostsKey = loggedUser ? ('gdg_liked_posts_' + loggedUser) : '';
     const likedPosts = loggedUser ? (JSON.parse(localStorage.getItem(likedPostsKey)) || []) : [];
+    const isAdmin = isUserAdmin();
 
     snapshot.forEach((doc) => {
       const post = doc.data();
@@ -357,9 +377,9 @@
         ? "background: rgba(56, 189, 248, 0.85); border-color: #ffffff;" 
         : "background: rgba(2, 132, 199, 0.5);";
 
-      // Mostra il tasto elimina post solo se sei l'autore o l'admin "Fronte"
+      // Mostra il tasto elimina se l'utente è l'autore O se è Admin (Fronte / UID Admin)
       let deletePostBtn = '';
-      if (loggedUser && (loggedUser === post.author || loggedUser.toLowerCase() === 'fronte')) {
+      if (loggedUser && (loggedUser === post.author || isAdmin)) {
         deletePostBtn = `<button onclick="deletePost('${postId}')" style="background: rgba(239,68,68,0.6); border: 1px solid #fca5a5; color: white; padding: 4px 10px; border-radius: 6px; cursor: pointer; float: right; font-size: 0.8rem;">🗑️ Elimina Post</button>`;
       }
 
@@ -382,7 +402,7 @@
         <!-- Sezione Commenti -->
         <div class="comments-section" id="comments-${postId}">
           <div id="commentList-${postId}">
-            ${renderComments(post.comments || [], postId, loggedUser)}
+            ${renderComments(post.comments || [], postId, loggedUser, isAdmin)}
           </div>
           <div class="add-comment-box">
             <input type="text" id="inputComment-${postId}" placeholder="Scrivi un commento...">
@@ -395,15 +415,15 @@
     });
   });
 
-  // Renderizza la lista commenti con eventuale tasto elimina
-  function renderComments(comments, postId, loggedUser) {
+  // Renderizza i commenti e gestisce i permessi di eliminazione
+  function renderComments(comments, postId, loggedUser, isAdmin) {
     if (comments.length === 0) {
       return '<p style="font-size:0.8rem; color:#bae6fd; margin:4px 0;">Nessun commento ancora.</p>';
     }
     
     return comments.map((c, index) => {
       let deleteCommentBtn = '';
-      if (loggedUser && (loggedUser === c.author || loggedUser.toLowerCase() === 'fronte')) {
+      if (loggedUser && (loggedUser === c.author || isAdmin)) {
         deleteCommentBtn = `<button onclick="deleteComment('${postId}', ${index})" style="background: none; border: none; color: #fca5a5; cursor: pointer; font-size: 0.8rem; float: right;" title="Elimina commento">❌</button>`;
       }
 
@@ -421,7 +441,7 @@
   async function createNewPost() {
     const author = getLoggedUser();
     if (!author) {
-      alert("Devi prima accedere con il tuo account dalla pagina Account per pubblicare un post!");
+      alert("Devi prima accedere con il tuo account per pubblicare un post!");
       window.location.href = "account.html";
       return;
     }
@@ -470,12 +490,10 @@
 
     try {
       if (likedPosts.includes(postId)) {
-        // Rimuovi il like (-1)
         likedPosts = likedPosts.filter(id => id !== postId);
         const newLikes = Math.max(0, currentLikes - 1);
         await postRef.update({ likes: newLikes });
       } else {
-        // Aggiungi il like (+1)
         likedPosts.push(postId);
         const newLikes = currentLikes + 1;
         await postRef.update({ likes: newLikes });
@@ -531,31 +549,72 @@
     }
   }
 
-  // Funzione per eliminare un intero post
+  // Funzione sicura per eliminare un intero post
   async function deletePost(postId) {
-    if (!confirm("Sei sicuro di voler eliminare questo post?")) return;
-
-    try {
-      await db.collection('posts').doc(postId).delete();
-    } catch (e) {
-      console.error("Errore durante l'eliminazione del post:", e);
-      alert("Non è stato possibile eliminare il post.");
+    const loggedUser = getLoggedUser();
+    if (!loggedUser) {
+      alert("Devi effettuare l'accesso!");
+      return;
     }
-  }
-
-  // Funzione per eliminare un singolo commento
-  async function deleteComment(postId, commentIndex) {
-    if (!confirm("Vuoi eliminare questo commento?")) return;
 
     try {
       const postRef = db.collection('posts').doc(postId);
       const doc = await postRef.get();
 
-      if (doc.exists) {
-        let comments = doc.data().comments || [];
-        comments.splice(commentIndex, 1);
-        await postRef.update({ comments: comments });
+      if (!doc.exists) {
+        alert("Il post non esiste.");
+        return;
       }
+
+      const postData = doc.data();
+      const isAuthor = postData.author === loggedUser;
+      const isAdmin = isUserAdmin();
+
+      if (!isAuthor && !isAdmin) {
+        alert("Non sei autorizzato a eliminare questo post!");
+        return;
+      }
+
+      if (!confirm("Sei sicuro di voler eliminare questo post?")) return;
+
+      await postRef.delete();
+    } catch (e) {
+      console.error("Errore durante l'eliminazione del post:", e);
+      alert("Impossibile eliminare il post.");
+    }
+  }
+
+  // Funzione sicura per eliminare un singolo commento
+  async function deleteComment(postId, commentIndex) {
+    const loggedUser = getLoggedUser();
+    if (!loggedUser) {
+      alert("Devi effettuare l'accesso!");
+      return;
+    }
+
+    try {
+      const postRef = db.collection('posts').doc(postId);
+      const doc = await postRef.get();
+
+      if (!doc.exists) return;
+
+      let comments = doc.data().comments || [];
+      const targetComment = comments[commentIndex];
+
+      if (!targetComment) return;
+
+      const isCommentAuthor = targetComment.author === loggedUser;
+      const isAdmin = isUserAdmin();
+
+      if (!isCommentAuthor && !isAdmin) {
+        alert("Non sei autorizzato a eliminare questo commento!");
+        return;
+      }
+
+      if (!confirm("Vuoi eliminare questo commento?")) return;
+
+      comments.splice(commentIndex, 1);
+      await postRef.update({ comments: comments });
     } catch (e) {
       console.error("Errore durante l'eliminazione del commento:", e);
       alert("Impossibile eliminare il commento.");
