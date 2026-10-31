@@ -14,350 +14,341 @@
     font-family: "Segoe UI", system-ui, -apple-system, Roboto, sans-serif;
     color: #e0f2fe;
     line-height: 1.6;
-    overflow-x: hidden;
-    background:
-      radial-gradient(circle at 15% 8%, rgba(56, 189, 248, 0.35), transparent 38%),
-      radial-gradient(circle at 90% 35%, rgba(14, 165, 233, 0.35), transparent 42%),
-      radial-gradient(circle at 50% 85%, rgba(3, 105, 161, 0.25), transparent 50%),
-      linear-gradient(160deg, #0284c7 0%, #0369a1 50%, #075985 100%);
-    background-attachment: fixed;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background: url('img/sfondominecraft1.png') no-repeat center center fixed;
+    background-size: cover;
+    background-color: #0c4a6e;
+    padding: 20px;
   }
 
-  .wrap { 
-    width: 100%; 
-    max-width: 500px; 
-    margin: 0 auto; 
-    padding: 18px; 
-  }
-
-  .glass {
-    background: linear-gradient(180deg, rgba(186, 230, 253, 0.22), rgba(12, 74, 110, 0.45));
+  .card {
+    width: 100%;
+    max-width: 420px;
+    background: rgba(12, 74, 110, 0.85);
     border: 1px solid rgba(125, 211, 252, 0.45);
     border-radius: 16px;
     box-shadow: 0 8px 28px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(224, 242, 254, 0.5);
     -webkit-backdrop-filter: blur(12px);
     backdrop-filter: blur(12px);
-    padding: 24px;
-    margin-bottom: 18px;
+    padding: 30px;
     text-align: center;
   }
 
-  header.glass { 
-    margin-top: 24px; 
-    padding: 24px 20px; 
-  }
-
   h1 {
-    margin: 0 0 6px;
-    font-size: clamp(1.8rem, 7vw, 2.4rem);
+    margin: 0 0 10px;
+    font-size: 2rem;
     color: #ffffff;
     text-shadow: 0 0 16px rgba(56, 189, 248, 0.9);
   }
 
-  p { margin: 0; color: #bae6fd; font-size: 0.95rem; }
+  p {
+    color: #bae6fd;
+    font-size: 0.95rem;
+    margin-bottom: 24px;
+  }
 
-  .form-group {
-    display: flex;
-    flex-direction: column;
-    gap: 14px;
-    margin-top: 16px;
+  .input-group {
+    margin-bottom: 16px;
+    text-align: left;
+  }
+
+  label {
+    display: block;
+    font-size: 0.85rem;
+    color: #7dd3fc;
+    margin-bottom: 6px;
+    font-weight: 600;
   }
 
   .input-field {
     width: 100%;
     padding: 12px 16px;
-    border-radius: 999px;
+    border-radius: 8px;
     border: 1px solid #7dd3fc;
-    background: rgba(255, 255, 255, 0.9);
+    background: rgba(255, 255, 255, 0.95);
     color: #0f172a;
-    font-size: 0.95rem;
+    font-size: 1rem;
     outline: none;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.2);
   }
 
-  .input-field:focus {
-    border-color: #ffffff;
-    box-shadow: 0 0 12px rgba(56, 189, 248, 0.8);
-  }
-
-  .profile-img {
-    width: 100px;
-    height: 100px;
-    object-fit: cover;
-    border-radius: 50%;
-    border: 2px solid #7dd3fc;
-    box-shadow: 0 0 16px rgba(56, 189, 248, 0.6);
-    margin: 0 auto 14px;
-    background-color: #0c4a6e;
-  }
-
-  .btn {
+  .action-btn {
     width: 100%;
-    min-height: 44px;
-    padding: 10px 20px;
-    color: #ffffff;
-    font-weight: 600;
-    text-align: center;
-    border: 1px solid #7dd3fc;
+    padding: 12px;
     border-radius: 999px;
-    background: linear-gradient(180deg, #38bdf8 0%, #0284c7 50%, #0369a1 51%, #0284c7 100%);
-    box-shadow: 0 0 12px rgba(56, 189, 248, 0.5);
+    border: 1px solid #7dd3fc;
+    background: linear-gradient(180deg, #38bdf8 0%, #0284c7 100%);
+    color: white;
+    font-weight: bold;
+    font-size: 1rem;
     cursor: pointer;
+    box-shadow: 0 0 14px rgba(56, 189, 248, 0.5);
+    margin-top: 10px;
     transition: all 0.2s ease;
   }
 
-  .btn:hover {
+  .action-btn:hover {
     transform: translateY(-1px);
-    box-shadow: 0 0 16px rgba(56, 189, 248, 0.8);
+    box-shadow: 0 0 18px rgba(56, 189, 248, 0.8);
   }
 
   .toggle-link {
-    margin-top: 14px;
+    margin-top: 16px;
     font-size: 0.9rem;
     color: #bae6fd;
     cursor: pointer;
     text-decoration: underline;
   }
 
-  .toggle-link:hover { color: #ffffff; }
-
-  .back-container {
-    text-align: center;
-    margin-top: 10px;
-    margin-bottom: 20px;
-  }
-
-  .btn-back {
-    display: inline-block;
-    padding: 10px 24px;
+  .toggle-link:hover {
     color: #ffffff;
-    font-weight: 600;
-    text-decoration: none;
-    border: 1px solid rgba(125, 211, 252, 0.4);
-    border-radius: 999px;
-    background: rgba(12, 74, 110, 0.6);
   }
 
   .error-msg {
     color: #fca5a5;
     font-size: 0.85rem;
-    margin-top: 8px;
+    margin-top: 10px;
+    font-weight: 600;
   }
 
-  footer { 
-    text-align: center; 
-    color: #7dd3fc; 
-    font-size: .9rem; 
-    padding: 10px 0 30px; 
+  .success-msg {
+    color: #86efac;
+    font-size: 0.85rem;
+    margin-top: 10px;
+    font-weight: 600;
+  }
+
+  /* Sezione utente loggato */
+  #loggedSection {
+    display: none;
+  }
+
+  .user-avatar {
+    width: 90px;
+    height: 90px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid #7dd3fc;
+    margin: 0 auto 16px;
+    box-shadow: 0 0 12px rgba(56, 189, 248, 0.5);
+  }
+
+  .back-link {
+    display: inline-block;
+    margin-top: 20px;
+    color: #7dd3fc;
+    text-decoration: none;
+    font-size: 0.9rem;
+  }
+
+  .back-link:hover {
+    text-decoration: underline;
   }
 </style>
 </head>
 <body>
-<div class="wrap">
 
-  <header class="glass">
+<div class="card">
+  
+  <!-- Form di Autenticazione (Login / Registrazione) -->
+  <div id="authFormContainer">
     <h1 id="formTitle">Accedi</h1>
-    <p id="formSubtitle">Inserisci le tue credenziali per entrare</p>
-  </header>
+    <p id="formSubtitle">Gestisci il tuo profilo su Giornale Dei Gamer</p>
 
-  <!-- Form Login / Registrazione -->
-  <div class="glass" id="authBox">
-    <div class="form-group">
-      <input type="text" id="usernameInput" class="input-field" placeholder="Nome utente (Nickname)" required>
-      <input type="password" id="passwordInput" class="input-field" placeholder="Password" required>
-      <button class="btn" id="actionBtn" onclick="handleAuth()">Accedi</button>
+    <div class="input-group">
+      <label for="username">Nickname</label>
+      <input type="text" id="username" class="input-field" placeholder="Inserisci il tuo nickname...">
     </div>
-    <div class="error-msg" id="errorMsg"></div>
-    <div class="toggle-link" id="toggleModeBtn" onclick="toggleMode()">Non hai un account? Registrati</div>
-  </div>
 
-  <!-- Profilo Utente / Pannello Admin -->
-  <div class="glass" id="profileBox" style="display: none;">
-    <img id="userImgDisplay" class="profile-img" src="logo2.jpg" alt="Immagine profilo">
-    <h2>Benvenuto, <span id="userNicknameDisplay"></span>!</h2>
-    <p style="margin-top: 4px; margin-bottom: 16px;">Sei connesso al tuo account locale.</p>
+    <div class="input-group">
+      <label for="password">Password</label>
+      <input type="password" id="password" class="input-field" placeholder="Inserisci la password...">
+    </div>
+
+    <button class="action-btn" id="submitBtn" onclick="handleAuth()">Accedi</button>
     
-    <div class="form-group">
-      <input type="text" id="newImgUrl" class="input-field" placeholder="Incolla il tuo nuovo URL immagine...">
-      <button class="btn" onclick="updateProfileImage()">Aggiorna la mia immagine</button>
-    </div>
+    <div id="messageBox"></div>
 
-    <!-- PANNELLO ADMIN (Visibile solo se ti logghi come "Fronte") -->
-    <div id="adminPanel" style="display: none; margin-top: 24px; padding-top: 16px; border-top: 1px solid rgba(125, 211, 252, 0.4);">
-      <h3 style="color: #ffffff; margin-bottom: 10px; font-size: 1.1rem; text-shadow: 0 0 10px rgba(56,189,248,0.6);">🛠️ Console Admin (Gestione Utenti)</h3>
-      <div class="form-group">
-        <input type="text" id="adminTargetUser" class="input-field" placeholder="Nome utente da modificare...">
-        <input type="text" id="adminTargetImg" class="input-field" placeholder="Nuovo URL immagine per quell'utente...">
-        <button class="btn" onclick="adminUpdateUserImage()" style="background: linear-gradient(180deg, #f59e0b 0%, #d97706 100%); border-color: #fcd34d;">Forza Modifica Immagine Utente</button>
-      </div>
-    </div>
-
-    <div class="form-group" style="margin-top: 16px;">
-      <button class="btn" onclick="logoutUser()" style="background: linear-gradient(180deg, #ef4444 0%, #b91c1c 100%); border-color: #fca5a5;">Esci dall'account</button>
+    <div class="toggle-link" id="toggleModeBtn" onclick="toggleAuthMode()">
+      Non hai un account? Registrati
     </div>
   </div>
 
-  <div class="back-container">
-    <a class="btn-back" href="index.html">Torna alla Home</a>
+  <!-- Area Utente Loggato -->
+  <div id="loggedSection">
+    <img id="userAvatarImg" class="user-avatar" src="logo2.jpg" alt="Avatar utente" onerror="this.src='logo2.jpg'">
+    <h1 id="loggedUsername">Bentornato!</h1>
+    <p>Sei correttamente autenticato.</p>
+
+    <!-- Pannello Admin visibile solo per Fronte -->
+    <div id="adminPanel" style="display:none; margin-top: 15px; padding: 12px; background: rgba(2, 132, 199, 0.3); border-radius: 8px; border: 1px dashed #7dd3fc;">
+      <p style="margin: 0 0 8px; font-size: 0.85rem; color: #ffffff; font-weight: bold;">🛠️ Pannello Admin (Fronte)</p>
+      <input type="text" id="adminTargetUser" class="input-field" placeholder="Nickname utente da modificare" style="margin-bottom: 6px; font-size: 0.85rem; padding: 8px;">
+      <input type="text" id="adminNewAvatar" class="input-field" placeholder="Nuovo URL immagine profilo" style="margin-bottom: 8px; font-size: 0.85rem; padding: 8px;">
+      <button class="action-btn" onclick="adminChangeAvatar()" style="padding: 8px; font-size: 0.85rem; margin-top:0;">Aggiorna Avatar Utente</button>
+    </div>
+
+    <button class="action-btn" onclick="logout()" style="background: linear-gradient(180deg, #ef4444 0%, #b91c1c 100%); border-color: #fca5a5; margin-top: 15px;">Esci dall'account</button>
   </div>
 
-  <footer>Giornale Dei Gamer · Tutti i diritti riservati</footer>
+  <a class="back-link" href="index.html">← Torna alla Home</a>
 
 </div>
 
 <script>
   let isRegistering = false;
 
-  function checkLoginState() {
-    const loggedUser = localStorage.getItem('gdg_logged_user');
-    const authBox = document.getElementById('authBox');
-    const profileBox = document.getElementById('profileBox');
-    const adminPanel = document.getElementById('adminPanel');
+  // Controlla lo stato all'avvio della pagina
+  window.addEventListener('DOMContentLoaded', () => {
+    checkLoggedState();
+  });
 
-    if (loggedUser) {
-      authBox.style.display = 'none';
-      profileBox.style.display = 'block';
-
-      const userData = JSON.parse(localStorage.getItem('gdg_user_' + loggedUser));
-      document.getElementById('userNicknameDisplay').textContent = loggedUser;
-      
-      if (userData && userData.profileImg) {
-        document.getElementById('userImgDisplay').src = userData.profileImg;
-      }
-
-      // Mostra la console admin se l'utente loggato è "Fronte"
-      if (loggedUser.toLowerCase() === 'fronte') {
-        adminPanel.style.display = 'block';
-      } else {
-        adminPanel.style.display = 'none';
-      }
-    } else {
-      authBox.style.display = 'block';
-      profileBox.style.display = 'none';
-    }
-  }
-
-  function toggleMode() {
+  // Cambia tra Login e Registrazione
+  function toggleAuthMode() {
     isRegistering = !isRegistering;
     const title = document.getElementById('formTitle');
     const subtitle = document.getElementById('formSubtitle');
-    const btn = document.getElementById('actionBtn');
+    const btn = document.getElementById('submitBtn');
     const toggleLink = document.getElementById('toggleModeBtn');
-    document.getElementById('errorMsg').textContent = '';
+    
+    document.getElementById('messageBox').innerHTML = '';
 
     if (isRegistering) {
       title.textContent = "Registrati";
-      subtitle.textContent = "Crea un nuovo account con nickname e password";
-      btn.textContent = "Registrati";
+      subtitle.textContent = "Crea un nuovo account gamer";
+      btn.textContent = "Crea Account";
       toggleLink.textContent = "Hai già un account? Accedi";
     } else {
       title.textContent = "Accedi";
-      subtitle.textContent = "Inserisci le tue credenziali per entrare";
+      subtitle.textContent = "Gestisci il tuo profilo su Giornale Dei Gamer";
       btn.textContent = "Accedi";
       toggleLink.textContent = "Non hai un account? Registrati";
     }
   }
 
+  // Gestione Login / Registrazione
   function handleAuth() {
-    const username = document.getElementById('usernameInput').value.trim();
-    const password = document.getElementById('passwordInput').value.trim();
-    const errorBox = document.getElementById('errorMsg');
-    errorBox.textContent = '';
+    const usernameInput = document.getElementById('username').value.trim();
+    const passwordInput = document.getElementById('password').value.trim();
+    const messageBox = document.getElementById('messageBox');
 
-    if (!username || !password) {
-      errorBox.textContent = "Compila tutti i campi!";
+    messageBox.innerHTML = '';
+
+    if (!usernameInput || !passwordInput) {
+      messageBox.innerHTML = '<div class="error-msg">Compila tutti i campi!</div>';
       return;
     }
 
-    const userKey = 'gdg_user_' + username;
+    const userKey = 'gdg_user_' + usernameInput.toLowerCase();
 
     if (isRegistering) {
-      if (localStorage.getItem(userKey)) {
-        errorBox.textContent = "Questo nome utente esiste già!";
+      // Eccezione: se il nome utente è 'fronte', permettiamo la registrazione/sovrascrizione senza blocchi
+      if (localStorage.getItem(userKey) && usernameInput.toLowerCase() !== 'fronte') {
+        messageBox.innerHTML = '<div class="error-msg">Questo nome utente esiste già!</div>';
         return;
       }
 
-      const newUser = {
-        password: password,
-        profileImg: "logo2.jpg" // Immagine predefinita (favicon)
+      // Salva utente
+      const userData = {
+        username: usernameInput,
+        password: passwordInput,
+        avatar: 'logo2.jpg'
       };
-      localStorage.setItem(userKey, JSON.stringify(newUser));
-      localStorage.setItem('gdg_logged_user', username);
-      alert("Registrazione completata con successo!");
-    } else {
-      const storedData = localStorage.getItem(userKey);
-      if (!storedData) {
-        errorBox.textContent = "Utente non trovato.";
-        return;
-      }
-
-      const userData = JSON.parse(storedData);
-      if (userData.password !== password) {
-        errorBox.textContent = "Password errata.";
-        return;
-      }
-
-      localStorage.setItem('gdg_logged_user', username);
-    }
-
-    document.getElementById('usernameInput').value = '';
-    document.getElementById('passwordInput').value = '';
-    checkLoginState();
-  }
-
-  function updateProfileImage() {
-    const newUrl = document.getElementById('newImgUrl').value.trim();
-    if (!newUrl) {
-      alert("Inserisci un URL valido!");
-      return;
-    }
-
-    const loggedUser = localStorage.getItem('gdg_logged_user');
-    if (loggedUser) {
-      const userKey = 'gdg_user_' + loggedUser;
-      let userData = JSON.parse(localStorage.getItem(userKey));
-      userData.profileImg = newUrl;
       localStorage.setItem(userKey, JSON.stringify(userData));
+      localStorage.setItem('gdg_logged_user', usernameInput);
 
-      document.getElementById('userImgDisplay').src = newUrl;
-      document.getElementById('newImgUrl').value = '';
-      alert("Immagine profilo aggiornata!");
+      messageBox.innerHTML = '<div class="success-msg">Registrazione completata! Accesso in corso...</div>';
+      setTimeout(() => { checkLoggedState(); }, 1000);
+
+    } else {
+      // Login
+      const savedDataJson = localStorage.getItem(userKey);
+      if (!savedDataJson) {
+        messageBox.innerHTML = '<div class="error-msg">Utente non trovato! Registrati prima.</div>';
+        return;
+      }
+
+      const savedData = JSON.parse(savedDataJson);
+      if (savedData.password !== passwordInput) {
+        messageBox.innerHTML = '<div class="error-msg">Password errata!</div>';
+        return;
+      }
+
+      localStorage.setItem('gdg_logged_user', savedData.username);
+      messageBox.innerHTML = '<div class="success-msg">Accesso riuscito! Reindirizzamento...</div>';
+      setTimeout(() => { checkLoggedState(); }, 800);
     }
   }
 
-  // Console Admin: Forza modifica immagine per qualsiasi utente
-  function adminUpdateUserImage() {
-    const targetUser = document.getElementById('adminTargetUser').value.trim();
-    const newImg = document.getElementById('adminTargetImg').value.trim();
+  // Controlla se c'è un utente loggato nel localStorage
+  function checkLoggedState() {
+    const loggedUser = localStorage.getItem('gdg_logged_user');
+    const authContainer = document.getElementById('authFormContainer');
+    const loggedSection = document.getElementById('loggedSection');
 
-    if (!targetUser || !newImg) {
-      alert("Inserisci sia il nome utente che il nuovo URL dell'immagine!");
+    if (loggedUser) {
+      authContainer.style.display = 'none';
+      loggedSection.style.display = 'block';
+
+      document.getElementById('loggedUsername').textContent = loggedUser;
+
+      // Carica avatar personalizzato se presente
+      const userKey = 'gdg_user_' + loggedUser.toLowerCase();
+      const userDataJson = localStorage.getItem(userKey);
+      if (userDataJson) {
+        const userData = JSON.parse(userDataJson);
+        if (userData.avatar) {
+          document.getElementById('userAvatarImg').src = userData.avatar;
+        }
+      }
+
+      // Mostra pannello admin se l'utente è Fronte
+      if (loggedUser.toLowerCase() === 'fronte') {
+        document.getElementById('adminPanel').style.display = 'block';
+      }
+    } else {
+      authContainer.style.display = 'block';
+      loggedSection.style.display = 'none';
+    }
+  }
+
+  // Funzione Admin per cambiare l'avatar di qualsiasi utente
+  function adminChangeAvatar() {
+    const targetName = document.getElementById('adminTargetUser').value.trim();
+    const newAvatarUrl = document.getElementById('adminNewAvatar').value.trim();
+
+    if (!targetName || !newAvatarUrl) {
+      alert("Inserisci sia il nickname che il nuovo URL dell'immagine!");
       return;
     }
 
-    const userKey = 'gdg_user_' + targetUser;
-    const storedData = localStorage.getItem(userKey);
+    const userKey = 'gdg_user_' + targetName.toLowerCase();
+    const userDataJson = localStorage.getItem(userKey);
 
-    if (!storedData) {
-      alert("L'utente '" + targetUser + "' non esiste nel database locale!");
+    if (!userDataJson) {
+      alert("Utente non trovato nel database locale!");
       return;
     }
 
-    let userData = JSON.parse(storedData);
-    userData.profileImg = newImg;
+    let userData = JSON.parse(userDataJson);
+    userData.avatar = newAvatarUrl;
     localStorage.setItem(userKey, JSON.stringify(userData));
 
+    alert(`Avatar aggiornato con successo per l'utente ${targetName}!`);
     document.getElementById('adminTargetUser').value = '';
-    document.getElementById('adminTargetImg').value = '';
-    alert("Successo! L'immagine del profilo di '" + targetUser + "' è stata modificata dalla console admin.");
+    document.getElementById('adminNewAvatar').value = '';
   }
 
-  function logoutUser() {
+  // Logout
+  function logout() {
     localStorage.removeItem('gdg_logged_user');
-    checkLoginState();
+    document.getElementById('username').value = '';
+    document.getElementById('password').value = '';
+    document.getElementById('messageBox').innerHTML = '';
+    checkLoggedState();
   }
-
-  window.onload = checkLoginState;
 </script>
 
 </body>
