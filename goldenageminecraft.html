@@ -294,8 +294,8 @@
     <div class="add-post-form">
       <input type="text" id="postTitle" class="input-field" placeholder="Titolo del post..." required>
       <textarea id="postContent" class="input-field" placeholder="Scrivi il tuo messaggio..." required></textarea>
-      <!-- Campo immagine riservato all'Admin -->
-      <input type="text" id="postImageUrl" class="input-field" placeholder="URL Immagine (Solo per Fronte ★)" style="display: none;">
+      <!-- Campo immagine/video riservato all'Admin -->
+      <input type="text" id="postImageUrl" class="input-field" placeholder="URL Immagine o Video .mp4 (Solo per Fronte ★)" style="display: none;">
       <button class="submit-btn" onclick="createNewPost()">Pubblica Post</button>
     </div>
 
@@ -387,7 +387,7 @@
     }
   }
 
-  function isValidImageUrl(url) {
+  function isValidMediaUrl(url) {
     if (!url) return true;
     const cleanUrl = url.toLowerCase().trim();
     const urlWithoutParams = cleanUrl.split('?')[0];
@@ -395,15 +395,11 @@
     const hasValidExtension = urlWithoutParams.endsWith('.jpg') || 
                               urlWithoutParams.endsWith('.jpeg') || 
                               urlWithoutParams.endsWith('.png') || 
-                              urlWithoutParams.endsWith('.webp');
-                              
-    const isGifOrVideo = urlWithoutParams.includes('.gif') || 
-                         urlWithoutParams.includes('.mp4') || 
-                         urlWithoutParams.includes('.webm') || 
-                         urlWithoutParams.includes('youtube.com') || 
-                         urlWithoutParams.includes('youtu.be');
+                              urlWithoutParams.endsWith('.webp') ||
+                              urlWithoutParams.endsWith('.mp4') ||
+                              urlWithoutParams.endsWith('.webm');
 
-    return hasValidExtension && !isGifOrVideo;
+    return hasValidExtension;
   }
 
   async function changeUserCoins(authorUsername, deltaAmount) {
@@ -433,7 +429,7 @@
     }
   });
 
-  // Caricamento post dedicati a questa sezione (usiamo una collezione Firestore separata: 'golden_age_posts')
+  // Caricamento post dedicati alla collezione 'golden_age_posts'
   db.collection('golden_age_posts').orderBy('timestamp', 'desc').onSnapshot((snapshot) => {
     const container = document.getElementById('postsContainer');
     container.innerHTML = '';
@@ -458,9 +454,21 @@
       card.className = 'post-card';
       card.id = `post-${postId}`;
 
-      let imageHtml = '';
+      let mediaHtml = '';
       if (post.imageUrl) {
-        imageHtml = `<img class="post-img" src="${post.imageUrl}" alt="Immagine post" onerror="this.style.display='none'">`;
+        const cleanUrl = post.imageUrl.toLowerCase().trim().split('?')[0];
+        const isVideo = cleanUrl.endsWith('.mp4') || cleanUrl.endsWith('.webm');
+
+        if (isVideo) {
+          mediaHtml = `
+            <video class="post-img" controls preload="metadata" style="background: #000;">
+              <source src="${post.imageUrl}" type="video/mp4">
+              Il tuo browser non supporta il video.
+            </video>
+          `;
+        } else {
+          mediaHtml = `<img class="post-img" src="${post.imageUrl}" alt="Immagine post" onerror="this.style.display='none'">`;
+        }
       }
 
       const commentsCount = post.comments ? post.comments.length : 0;
@@ -485,7 +493,7 @@
           ${blockAuthorBtn}
         </div>
         <h3>${post.title}</h3>
-        ${imageHtml}
+        ${mediaHtml}
         <p>${post.content}</p>
 
         <div class="post-actions">
@@ -580,11 +588,11 @@
 
     if (imageUrl !== "") {
       if (!isUserAdmin()) {
-        alert("ATTENZIONE: Solo l'amministratore (Fronte ★) è autorizzato ad inserire immagini nei post!");
+        alert("ATTENZIONE: Solo l'amministratore (Fronte ★) è autorizzato ad inserire immagini o video nei post!");
         return;
       }
-      if (!isValidImageUrl(imageUrl)) {
-        alert("Link immagine non valido! Usa solo immagini statiche (es. .jpg, .png, .webp).");
+      if (!isValidMediaUrl(imageUrl)) {
+        alert("Link non valido! Usa solo immagini (.jpg, .png, .webp) o video diretti (.mp4).");
         return;
       }
     }
