@@ -1,1 +1,826 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>L'Era Dell'Oro · Giornale Dei Gamer</title>
+<link rel="icon" href="logo2.jpg">
+<style>
+  * { box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; }
+  body {
+    margin: 0;
+    min-height: 100vh;
+    font-family: "Segoe UI", system-ui, -apple-system, Roboto, sans-serif;
+    color: #e0f2fe;
+    line-height: 1.6;
+    overflow-x: hidden;
+    background: 
+      linear-gradient(rgba(15, 23, 42, 0.75), rgba(30, 41, 59, 0.75)), 
+      url('stonewallaper.png') center/cover no-repeat fixed;
+    background-color: #0f172a;
+  }
 
+  .wrap { 
+    width: 100%; 
+    max-width: 760px; 
+    margin: 0 auto; 
+    padding: 18px; 
+  }
+
+  .glass {
+    background: rgba(15, 23, 42, 0.75);
+    border: 1px solid rgba(251, 191, 36, 0.45);
+    border-radius: 16px;
+    box-shadow: 0 8px 28px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(254, 243, 199, 0.3);
+    -webkit-backdrop-filter: blur(12px);
+    backdrop-filter: blur(12px);
+    padding: 20px;
+    margin-bottom: 18px;
+    position: relative;
+  }
+
+  header.glass { 
+    margin-top: 24px; 
+    text-align: center; 
+    padding: 30px 20px; 
+  }
+
+  h1 {
+    margin: 0 0 10px;
+    font-size: clamp(1.8rem, 7vw, 2.8rem);
+    line-height: 1.1;
+    color: #ffffff;
+    text-shadow: 0 0 16px rgba(251, 191, 36, 0.9), 0 2px 4px rgba(0, 0, 0, 0.8);
+  }
+
+  header p { 
+    margin: 0; 
+    color: #fde68a; 
+    font-size: 1.05rem; 
+  }
+
+  .add-post-form {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-bottom: 20px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid rgba(251, 191, 36, 0.3);
+  }
+
+  .input-field {
+    width: 100%;
+    padding: 10px 14px;
+    border-radius: 8px;
+    border: 1px solid #fbbf24;
+    background: rgba(255, 255, 255, 0.95);
+    color: #0f172a;
+    font-size: 0.95rem;
+    outline: none;
+  }
+
+  textarea.input-field {
+    resize: vertical;
+    min-height: 70px;
+  }
+
+  .submit-btn {
+    align-self: flex-start;
+    padding: 8px 20px;
+    border-radius: 999px;
+    border: 1px solid #fef3c7;
+    background: linear-gradient(180deg, #fbbf24 0%, #d97706 100%);
+    color: white;
+    font-weight: 600;
+    cursor: pointer;
+    box-shadow: 0 0 10px rgba(251, 191, 36, 0.4);
+    transition: all 0.2s ease;
+  }
+
+  .submit-btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 0 14px rgba(251, 191, 36, 0.7);
+  }
+
+  .search-container {
+    margin-bottom: 16px;
+  }
+
+  .search-input {
+    width: 100%;
+    padding: 12px 18px;
+    border-radius: 999px;
+    border: 1px solid #ffffff;
+    background: #ffffff;
+    color: #0f172a;
+    font-size: 0.95rem;
+    outline: none;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+  }
+
+  .scroll-box {
+    max-height: 550px;
+    overflow-y: auto;
+    padding-right: 6px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .post-card {
+    background: rgba(15, 23, 42, 0.85);
+    border: 1px solid rgba(251, 191, 36, 0.3);
+    border-radius: 12px;
+    padding: 16px;
+    position: relative;
+  }
+
+  .post-header-line {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 6px;
+  }
+
+  .post-author {
+    font-size: 0.85rem;
+    color: #fde68a;
+    font-weight: bold;
+  }
+
+  .block-user-btn {
+    background: rgba(239, 68, 68, 0.2);
+    border: 1px solid #fca5a5;
+    color: #fca5a5;
+    padding: 2px 8px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.75rem;
+    font-weight: bold;
+    display: none;
+  }
+
+  .block-user-btn:hover {
+    background: rgba(239, 68, 68, 0.5);
+    color: white;
+  }
+
+  .post-card h3 {
+    margin: 0 0 8px;
+    font-size: 1.15rem;
+    color: #ffffff;
+  }
+
+  .post-card p {
+    margin: 0 0 14px;
+    color: #e2e8f0;
+    font-size: 0.95rem;
+  }
+
+  .post-img {
+    width: 100%;
+    max-height: 280px;
+    object-fit: cover;
+    border-radius: 8px;
+    margin-bottom: 12px;
+    border: 1px solid rgba(251, 191, 36, 0.4);
+  }
+
+  .post-actions {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    margin-bottom: 12px;
+    flex-wrap: wrap;
+  }
+
+  .like-btn, .comment-toggle-btn, .report-btn, .comment-like-btn {
+    background: rgba(217, 119, 6, 0.4);
+    border: 1px solid #fbbf24;
+    color: #ffffff;
+    padding: 6px 14px;
+    border-radius: 999px;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 0.85rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .report-btn {
+    background: rgba(245, 158, 11, 0.2);
+    border-color: #fde047;
+    color: #fef08a;
+  }
+
+  .comments-section {
+    margin-top: 10px;
+    padding-top: 10px;
+    border-top: 1px solid rgba(251, 191, 36, 0.2);
+    display: none;
+  }
+
+  .comment-item {
+    background: rgba(30, 41, 59, 0.6);
+    border-left: 3px solid #fbbf24;
+    padding: 8px 12px;
+    border-radius: 4px;
+    margin-bottom: 8px;
+    font-size: 0.88rem;
+    position: relative;
+  }
+
+  .comment-header-line {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .comment-author {
+    font-weight: bold;
+    color: #fde68a;
+    font-size: 0.8rem;
+  }
+
+  .add-comment-box {
+    display: flex;
+    gap: 8px;
+    margin-top: 10px;
+  }
+
+  .add-comment-box input {
+    flex: 1;
+    padding: 6px 12px;
+    border-radius: 999px;
+    border: 1px solid #fbbf24;
+    outline: none;
+    font-size: 0.85rem;
+  }
+
+  .add-comment-box button {
+    padding: 6px 14px;
+    border-radius: 999px;
+    border: none;
+    background: #d97706;
+    color: white;
+    cursor: pointer;
+    font-weight: bold;
+    font-size: 0.85rem;
+  }
+
+  .back-container { text-align: center; margin-top: 10px; margin-bottom: 20px; }
+  .btn {
+    display: inline-block; padding: 10px 24px; color: #ffffff; font-weight: 600;
+    text-decoration: none; border: 1px solid #fbbf24; border-radius: 999px;
+    background: linear-gradient(180deg, #fbbf24 0%, #d97706 100%);
+  }
+  footer { text-align: center; color: #fbbf24; font-size: .9rem; padding: 10px 0 30px; }
+</style>
+
+<script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore-compat.js"></script>
+</head>
+<body>
+
+<div class="wrap">
+  <header class="glass">
+    <h1>L'Era Dell'Oro</h1>
+    <p>dedicato alle versioni storiche di minecraft</p>
+  </header>
+
+  <div class="glass">
+    <div class="add-post-form">
+      <input type="text" id="postTitle" class="input-field" placeholder="Titolo del post..." required>
+      <textarea id="postContent" class="input-field" placeholder="Scrivi il tuo messaggio..." required></textarea>
+      <!-- Campo immagine riservato all'Admin -->
+      <input type="text" id="postImageUrl" class="input-field" placeholder="URL Immagine (Solo per Fronte ★)" style="display: none;">
+      <button class="submit-btn" onclick="createNewPost()">Pubblica Post</button>
+    </div>
+
+    <div class="search-container">
+      <input type="text" id="searchInput" class="search-input" placeholder="🔍 Cerca nei post..." onkeyup="filterPosts()">
+    </div>
+
+    <div class="scroll-box" id="postsContainer">
+      <p style="text-align:center;">Caricamento post da Firestore...</p>
+    </div>
+  </div>
+
+  <div class="back-container">
+    <a class="btn" href="minecraftcommunity.html">Torna a Minecraft Community</a>
+  </div>
+
+  <footer>Giornale Dei Gamer · Tutti i diritti riservati</footer>
+</div>
+
+<script>
+  const firebaseConfig = {
+    apiKey: "AIzaSyDSv5h11knmaS2CaJFTpgN6lTxEYptksRk",
+    authDomain: "giornaledeigamer---social.firebaseapp.com",
+    projectId: "giornaledeigamer---social",
+    storageBucket: "giornaledeigamer---social.firebasestorage.app",
+    messagingSenderId: "490970879261",
+    appId: "1:490970879261:web:00bb9ace1800dd8dbe7df4",
+    measurementId: "G-4K0NXCRDRL"
+  };
+
+  firebase.initializeApp(firebaseConfig);
+  const db = firebase.firestore();
+
+  const SUPER_ADMIN_UID = "2NjFn7umG1RszA2dciMsr5H1f7z2";
+
+  function getLoggedUser() {
+    return localStorage.getItem('gdg_logged_user');
+  }
+
+  function isUserAdmin() {
+    const loggedUser = getLoggedUser();
+    if (!loggedUser) return false;
+
+    const cleanLogged = loggedUser.trim().toLowerCase();
+    const isFronte = cleanLogged === 'fronte ★' || cleanLogged === 'fronte';
+
+    const userKey = 'gdg_user_' + cleanLogged;
+    const userDataJson = localStorage.getItem(userKey);
+    let userUid = '';
+    
+    if (userDataJson) {
+      const userData = JSON.parse(userDataJson);
+      userUid = userData.uid || '';
+    }
+
+    return isFronte || (userUid === SUPER_ADMIN_UID);
+  }
+
+  async function checkIfBlocked(username) {
+    if (!username) return false;
+    try {
+      const doc = await db.collection('blocked_users').doc(username.trim().toLowerCase()).get();
+      return doc.exists;
+    } catch(e) {
+      return false;
+    }
+  }
+
+  async function toggleBlockUser(username) {
+    if (!isUserAdmin()) return;
+    const targetKey = username.trim().toLowerCase();
+    const docRef = db.collection('blocked_users').doc(targetKey);
+
+    try {
+      const doc = await docRef.get();
+      if (doc.exists) {
+        if (confirm(`Vuoi sbloccare l'utente ${username}?`)) {
+          await docRef.delete();
+          alert(`Utente ${username} sbloccato.`);
+        }
+      } else {
+        if (confirm(`ATTENZIONE: Vuoi bloccare l'utente ${username}? Non potrà più postare o commentare.`)) {
+          await docRef.set({ blockedBy: getLoggedUser(), timestamp: firebase.firestore.FieldValue.serverTimestamp() });
+          alert(`Utente ${username} bloccato con successo.`);
+        }
+      }
+    } catch(e) {
+      console.error("Errore blocco utente:", e);
+    }
+  }
+
+  function isValidImageUrl(url) {
+    if (!url) return true;
+    const cleanUrl = url.toLowerCase().trim();
+    const urlWithoutParams = cleanUrl.split('?')[0];
+    
+    const hasValidExtension = urlWithoutParams.endsWith('.jpg') || 
+                              urlWithoutParams.endsWith('.jpeg') || 
+                              urlWithoutParams.endsWith('.png') || 
+                              urlWithoutParams.endsWith('.webp');
+                              
+    const isGifOrVideo = urlWithoutParams.includes('.gif') || 
+                         urlWithoutParams.includes('.mp4') || 
+                         urlWithoutParams.includes('.webm') || 
+                         urlWithoutParams.includes('youtube.com') || 
+                         urlWithoutParams.includes('youtu.be');
+
+    return hasValidExtension && !isGifOrVideo;
+  }
+
+  async function changeUserCoins(authorUsername, deltaAmount) {
+    if (!authorUsername) return;
+    const cleanUser = authorUsername.trim().toLowerCase();
+    const userDocRef = db.collection('users').doc(cleanUser);
+
+    try {
+      await db.runTransaction(async (transaction) => {
+        const doc = await transaction.get(userDocRef);
+        let currentCoins = 0;
+        if (doc.exists) {
+          currentCoins = doc.data().gdgcoin || 0;
+        }
+        const newCoins = Math.max(0, currentCoins + deltaAmount);
+        transaction.set(userDocRef, { gdgcoin: newCoins }, { merge: true });
+      });
+    } catch (e) {
+      console.error("Errore aggiornamento GDGCoin:", e);
+    }
+  }
+
+  window.addEventListener('DOMContentLoaded', () => {
+    if (isUserAdmin()) {
+      const imageInput = document.getElementById('postImageUrl');
+      if (imageInput) imageInput.style.display = 'block';
+    }
+  });
+
+  // Caricamento post dedicati a questa sezione (usiamo una collezione Firestore separata: 'golden_age_posts')
+  db.collection('golden_age_posts').orderBy('timestamp', 'desc').onSnapshot((snapshot) => {
+    const container = document.getElementById('postsContainer');
+    container.innerHTML = '';
+
+    if (snapshot.empty) {
+      container.innerHTML = '<p style="text-align:center;">Nessun post presente nell\'Era Dell\'Oro. Creane uno tu!</p>';
+      return;
+    }
+
+    const loggedUser = getLoggedUser();
+    const cleanLogged = loggedUser ? loggedUser.trim().toLowerCase() : '';
+    const isAdmin = isUserAdmin();
+
+    snapshot.forEach((doc) => {
+      const post = doc.data();
+      const postId = doc.id;
+      
+      const likedBy = post.likedBy || [];
+      const hasLiked = cleanLogged ? likedBy.includes(cleanLogged) : false;
+
+      const card = document.createElement('div');
+      card.className = 'post-card';
+      card.id = `post-${postId}`;
+
+      let imageHtml = '';
+      if (post.imageUrl) {
+        imageHtml = `<img class="post-img" src="${post.imageUrl}" alt="Immagine post" onerror="this.style.display='none'">`;
+      }
+
+      const commentsCount = post.comments ? post.comments.length : 0;
+      const likeBtnStyle = hasLiked 
+        ? "background: rgba(251, 191, 36, 0.85); border-color: #ffffff; color: #0f172a;" 
+        : "background: rgba(217, 119, 6, 0.4);";
+
+      let deletePostBtn = '';
+      if (loggedUser && (loggedUser === post.author || isAdmin)) {
+        deletePostBtn = `<button onclick="deletePost('${postId}')" style="background: rgba(239,68,68,0.6); border: 1px solid #fca5a5; color: white; padding: 4px 10px; border-radius: 6px; cursor: pointer; float: right; font-size: 0.8rem;">🗑️ Elimina Post</button>`;
+      }
+
+      let blockAuthorBtn = '';
+      if (isAdmin && post.author) {
+        blockAuthorBtn = `<button class="block-user-btn" style="display:inline-block;" onclick="toggleBlockUser('${post.author.replace(/'/g, "\\'")}')">🚫 Blocca Utente</button>`;
+      }
+
+      card.innerHTML = `
+        ${deletePostBtn}
+        <div class="post-header-line">
+          <div class="post-author">👤 ${post.author || 'Anonimo'}</div>
+          ${blockAuthorBtn}
+        </div>
+        <h3>${post.title}</h3>
+        ${imageHtml}
+        <p>${post.content}</p>
+
+        <div class="post-actions">
+          <button class="like-btn" style="${likeBtnStyle}" onclick="addLike('${postId}', '${(post.author || '').replace(/'/g, "\\'")}')">
+            👍 <span>${post.likes || 0}</span>
+          </button>
+          <button class="comment-toggle-btn" onclick="toggleComments('${postId}')">
+            💬 Commenti (<span>${commentsCount}</span>)
+          </button>
+        </div>
+
+        <div class="comments-section" id="comments-${postId}">
+          <div id="commentList-${postId}">
+            ${renderComments(post.comments || [], postId, loggedUser, isAdmin)}
+          </div>
+          <div class="add-comment-box">
+            <input type="text" id="inputComment-${postId}" placeholder="Scrivi un commento...">
+            <button onclick="addComment('${postId}')">Invia</button>
+          </div>
+        </div>
+      `;
+
+      container.appendChild(card);
+    });
+  });
+
+  function renderComments(comments, postId, loggedUser, isAdmin) {
+    if (comments.length === 0) {
+      return '<p style="font-size:0.8rem; color:#fde68a; margin:4px 0;">Nessun commento ancora.</p>';
+    }
+    
+    const cleanLogged = loggedUser ? loggedUser.trim().toLowerCase() : '';
+
+    return comments.map((c, index) => {
+      const commentLikedBy = c.likedBy || [];
+      const hasLikedComment = cleanLogged ? commentLikedBy.includes(cleanLogged) : false;
+      
+      const commentLikeBtnStyle = hasLikedComment
+        ? "background: rgba(251, 191, 36, 0.85); border-color: #ffffff; color: #0f172a;"
+        : "background: rgba(217, 119, 6, 0.3);";
+
+      let deleteCommentBtn = '';
+      if (loggedUser && (loggedUser === c.author || isAdmin)) {
+        deleteCommentBtn = `<button onclick="deleteComment('${postId}', ${index})" style="background: none; border: none; color: #fca5a5; cursor: pointer; font-size: 0.8rem; float: right;" title="Elimina commento">❌</button>`;
+      }
+
+      let blockCommentAuthorBtn = '';
+      if (isAdmin && c.author) {
+        blockCommentAuthorBtn = `<button class="block-user-btn" style="display:inline-block; font-size:0.65rem; padding:1px 6px;" onclick="toggleBlockUser('${c.author.replace(/'/g, "\\'")}')">🚫 Blocca</button>`;
+      }
+
+      return `
+        <div class="comment-item">
+          ${deleteCommentBtn}
+          <div class="comment-header-line">
+            <div class="comment-author">${c.author}</div>
+            ${blockCommentAuthorBtn}
+          </div>
+          <div>${c.text}</div>
+          <div style="margin-top:4px;">
+            <button class="comment-like-btn" style="${commentLikeBtnStyle} font-size:0.75rem; padding:2px 8px;" onclick="addCommentLike('${postId}', ${index}, '${(c.author || '').replace(/'/g, "\\'")}')">
+              👍 <span>${c.likes || 0}</span>
+            </button>
+          </div>
+        </div>
+      `;
+    }).join('');
+  }
+
+  async function createNewPost() {
+    const author = getLoggedUser();
+    if (!author) {
+      alert("Devi prima accedere con il tuo account per pubblicare un post!");
+      window.location.href = "account.html";
+      return;
+    }
+
+    if (await checkIfBlocked(author)) {
+      alert("Il tuo account è stato bloccato dall'amministratore. Non puoi pubblicare post.");
+      return;
+    }
+
+    const title = document.getElementById('postTitle').value.trim();
+    const content = document.getElementById('postContent').value.trim();
+    const imageUrlInput = document.getElementById('postImageUrl');
+    const imageUrl = imageUrlInput ? imageUrlInput.value.trim() : '';
+
+    if (!title || !content) {
+      alert("Inserisci sia il titolo che il testo del post!");
+      return;
+    }
+
+    if (imageUrl !== "") {
+      if (!isUserAdmin()) {
+        alert("ATTENZIONE: Solo l'amministratore (Fronte ★) è autorizzato ad inserire immagini nei post!");
+        return;
+      }
+      if (!isValidImageUrl(imageUrl)) {
+        alert("Link immagine non valido! Usa solo immagini statiche (es. .jpg, .png, .webp).");
+        return;
+      }
+    }
+
+    try {
+      await db.collection('golden_age_posts').add({
+        title: title,
+        content: content,
+        imageUrl: isUserAdmin() ? imageUrl : "",
+        author: author,
+        likes: 0,
+        likedBy: [],
+        comments: [],
+        timestamp: firebase.firestore.FieldValue.serverTimestamp()
+      });
+
+      document.getElementById('postTitle').value = '';
+      document.getElementById('postContent').value = '';
+      if (imageUrlInput) imageUrlInput.value = '';
+    } catch (e) {
+      console.error("Errore pubblicazione:", e);
+      alert("Errore durante la pubblicazione.");
+    }
+  }
+
+  async function addLike(postId, postAuthor) {
+    const loggedUser = getLoggedUser();
+    if (!loggedUser) {
+      alert("Devi accedere per mettere un like!");
+      window.location.href = "account.html";
+      return;
+    }
+
+    const cleanLogged = loggedUser.trim().toLowerCase();
+    const postRef = db.collection('golden_age_posts').doc(postId);
+
+    try {
+      await db.runTransaction(async (transaction) => {
+        const postDoc = await transaction.get(postRef);
+        if (!postDoc.exists) return;
+
+        const postData = postDoc.data();
+        let likedBy = postData.likedBy || [];
+        let likes = postData.likes || 0;
+
+        if (likedBy.includes(cleanLogged)) {
+          likedBy = likedBy.filter(u => u !== cleanLogged);
+          likes = Math.max(0, likes - 1);
+          transaction.update(postRef, { likes: likes, likedBy: likedBy });
+          changeUserCoins(postAuthor, -5);
+        } else {
+          likedBy.push(cleanLogged);
+          likes = likes + 1;
+          transaction.update(postRef, { likes: likes, likedBy: likedBy });
+          changeUserCoins(postAuthor, 5);
+        }
+      });
+    } catch (e) {
+      console.error("Errore gestione like post:", e);
+    }
+  }
+
+  async function addCommentLike(postId, commentIndex, commentAuthor) {
+    const loggedUser = getLoggedUser();
+    if (!loggedUser) {
+      alert("Devi accedere per mettere un like ai commenti!");
+      window.location.href = "account.html";
+      return;
+    }
+
+    const cleanLogged = loggedUser.trim().toLowerCase();
+    const postRef = db.collection('golden_age_posts').doc(postId);
+
+    try {
+      await db.runTransaction(async (transaction) => {
+        const postDoc = await transaction.get(postRef);
+        if (!postDoc.exists) return;
+
+        let comments = postDoc.data().comments || [];
+        if (!comments[commentIndex]) return;
+
+        let comment = comments[commentIndex];
+        let likedBy = comment.likedBy || [];
+        let likes = comment.likes || 0;
+
+        if (likedBy.includes(cleanLogged)) {
+          likedBy = likedBy.filter(u => u !== cleanLogged);
+          likes = Math.max(0, likes - 1);
+          comment.likes = likes;
+          comment.likedBy = likedBy;
+          transaction.update(postRef, { comments: comments });
+          changeUserCoins(commentAuthor, -5);
+        } else {
+          likedBy.push(cleanLogged);
+          likes = likes + 1;
+          comment.likes = likes;
+          comment.likedBy = likedBy;
+          transaction.update(postRef, { comments: comments });
+          changeUserCoins(commentAuthor, 5);
+        }
+      });
+    } catch (e) {
+      console.error("Errore gestione like commento:", e);
+    }
+  }
+
+  async function addComment(postId) {
+    const author = getLoggedUser();
+    if (!author) {
+      alert("Devi accedere per poter commentare!");
+      window.location.href = "account.html";
+      return;
+    }
+
+    if (await checkIfBlocked(author)) {
+      alert("Il tuo account è stato bloccato dall'amministratore. Non puoi commentare.");
+      return;
+    }
+
+    const input = document.getElementById(`inputComment-${postId}`);
+    const text = input.value.trim();
+
+    if (!text) return;
+
+    try {
+      const postRef = db.collection('golden_age_posts').doc(postId);
+      const doc = await postRef.get();
+
+      if (doc.exists) {
+        const currentComments = doc.data().comments || [];
+        currentComments.push({
+          author: author,
+          text: text,
+          likes: 0,
+          likedBy: [],
+          date: new Date().toISOString()
+        });
+
+        await postRef.update({ comments: currentComments });
+        input.value = '';
+      }
+    } catch (e) {
+      console.error("Errore inserimento commento: ", e);
+    }
+  }
+
+  function toggleComments(postId) {
+    const el = document.getElementById(`comments-${postId}`);
+    if (el) {
+      el.style.display = (el.style.display === 'block') ? 'none' : 'block';
+    }
+  }
+
+  async function deletePost(postId) {
+    const loggedUser = getLoggedUser();
+    if (!loggedUser) {
+      alert("Devi effettuare l'accesso!");
+      return;
+    }
+
+    try {
+      const postRef = db.collection('golden_age_posts').doc(postId);
+      const doc = await postRef.get();
+
+      if (!doc.exists) {
+        alert("Il post non esiste.");
+        return;
+      }
+
+      const postData = doc.data();
+      const isAuthor = postData.author === loggedUser;
+      const isAdmin = isUserAdmin();
+
+      if (!isAuthor && !isAdmin) {
+        alert("Non sei autorizzato a eliminare questo post!");
+        return;
+      }
+
+      if (!confirm("Sei sicuro di voler eliminare questo post?")) return;
+
+      await postRef.delete();
+    } catch (e) {
+      console.error("Errore durante l'eliminazione del post:", e);
+      alert("Impossibile eliminare il post.");
+    }
+  }
+
+  async function deleteComment(postId, commentIndex) {
+    const loggedUser = getLoggedUser();
+    if (!loggedUser) {
+      alert("Devi effettuare l'accesso!");
+      return;
+    }
+
+    try {
+      const postRef = db.collection('golden_age_posts').doc(postId);
+      const doc = await postRef.get();
+
+      if (!doc.exists) return;
+
+      let comments = doc.data().comments || [];
+      const targetComment = comments[commentIndex];
+
+      if (!targetComment) return;
+
+      const isCommentAuthor = targetComment.author === loggedUser;
+      const isAdmin = isUserAdmin();
+
+      if (!isCommentAuthor && !isAdmin) {
+        alert("Non sei autorizzato a eliminare questo commento!");
+        return;
+      }
+
+      if (!confirm("Vuoi eliminare questo commento?")) return;
+
+      comments.splice(commentIndex, 1);
+      await postRef.update({ comments: comments });
+    } catch (e) {
+      console.error("Errore durante l'eliminazione del commento:", e);
+      alert("Impossibile eliminare il commento.");
+    }
+  }
+
+  function filterPosts() {
+    const query = document.getElementById('searchInput').value.toLowerCase();
+    const posts = document.querySelectorAll('.post-card');
+
+    posts.forEach(post => {
+      const text = post.textContent.toLowerCase();
+      if (text.includes(query)) {
+        post.style.display = 'block';
+      } else {
+        post.style.display = 'none';
+      }
+    });
+  }
+</script>
+</body>
+</html>
