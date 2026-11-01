@@ -52,7 +52,7 @@
   }
 
   header p { 
-    margin: 0; 
+    margin: 0 0 14px 0; 
     color: #bae6fd; 
     font-size: 1.05rem; 
   }
@@ -71,6 +71,25 @@
     cursor: pointer;
     box-shadow: 0 0 10px rgba(245, 158, 11, 0.5);
     display: none;
+  }
+
+  .golden-age-btn {
+    display: inline-block;
+    background: linear-gradient(180deg, #fbbf24 0%, #d97706 100%);
+    border: 1px solid #fef3c7;
+    color: #ffffff;
+    padding: 8px 18px;
+    border-radius: 999px;
+    font-weight: bold;
+    font-size: 0.9rem;
+    text-decoration: none;
+    box-shadow: 0 0 12px rgba(251, 191, 36, 0.6);
+    transition: all 0.2s ease;
+  }
+
+  .golden-age-btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 0 16px rgba(251, 191, 36, 0.9);
   }
 
   .add-post-form {
@@ -352,6 +371,7 @@
     <button id="adminMailBtn" class="admin-mail-btn" onclick="openReportsModal()">✉️ Mail (0)</button>
     <h1>Minecraft Community</h1>
     <p>Condividi idee, costruzioni e commenti con gli altri gamer.</p>
+    <a href="goldenageminecraft.html" class="golden-age-btn">🌟 Visita l'Era Dell'Oro</a>
   </header>
 
   <div class="glass">
@@ -694,7 +714,6 @@
     }
   }
 
-  // GESTIONE LIKE SICURA LATO SERVER PER EVITARE BUG E SPAM
   async function addLike(postId, postAuthor) {
     const loggedUser = getLoggedUser();
     if (!loggedUser) {
