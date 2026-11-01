@@ -358,7 +358,7 @@
     <div class="add-post-form">
       <input type="text" id="postTitle" class="input-field" placeholder="Titolo del post..." required>
       <textarea id="postContent" class="input-field" placeholder="Scrivi il tuo messaggio..." required></textarea>
-      <input type="text" id="postImageUrl" class="input-field" placeholder="URL Immagine (es. Reddit o link statico .jpg/.png)">
+      <input type="text" id="postImageUrl" class="input-field" placeholder="URL Immagine (Riservato all'Admin)">
       <button class="submit-btn" onclick="createNewPost()">Pubblica Post</button>
     </div>
 
@@ -657,9 +657,16 @@
       return;
     }
 
-    if (!isValidImageUrl(imageUrl)) {
-      alert("Link non valido! Puoi inserire solo link di immagini statiche (es. Reddit, .jpg, .png, .webp). Niente GIF, video o siti web.");
-      return;
+    // CONTROLLO DI SICUREZZA: Solo l'Admin (Fronte ★) può inserire immagini
+    if (imageUrl !== "") {
+      if (!isUserAdmin()) {
+        alert("ATTENZIONE: Solo l'amministratore (Fronte ★) è autorizzato ad inserire immagini nei post!");
+        return;
+      }
+      if (!isValidImageUrl(imageUrl)) {
+        alert("Link immagine non valido! Usa solo immagini statiche (es. .jpg, .png, .webp).");
+        return;
+      }
     }
 
     try {
