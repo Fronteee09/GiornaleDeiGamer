@@ -15,9 +15,9 @@
     color: #ffedd5;
     line-height: 1.6;
     overflow-x: hidden;
-    background: url('stickwarsfondo.png') no-repeat center center fixed;
+    background: url('sfondostickwar.png') no-repeat center center fixed;
     background-size: cover;
-    background-color: #431407; /* Fallback se l'immagine non carica */
+    background-color: #431407;
   }
 
   .wrap { 
@@ -360,7 +360,7 @@
     <div class="add-post-form">
       <input type="text" id="postTitle" class="input-field" placeholder="Titolo del post..." required>
       <textarea id="postContent" class="input-field" placeholder="Scrivi la tua strategia..." required></textarea>
-      <input type="text" id="postImageUrl" class="input-field" placeholder="URL Immagine (es. Reddit o link statico .jpg/.png)">
+      <input type="text" id="postImageUrl" class="input-field" placeholder="URL Immagine (Riservato all'Admin)">
       <button class="submit-btn" onclick="createNewPost()">Pubblica Post</button>
     </div>
 
@@ -511,7 +511,6 @@
     }
   });
 
-  // Usiamo una collezione dedicata per Stick War: 'stickwar_posts'
   db.collection('stickwar_posts').orderBy('timestamp', 'desc').onSnapshot((snapshot) => {
     const container = document.getElementById('postsContainer');
     container.innerHTML = '';
@@ -659,9 +658,16 @@
       return;
     }
 
-    if (!isValidImageUrl(imageUrl)) {
-      alert("Link non valido! Puoi inserire solo link di immagini statiche (es. Reddit, .jpg, .png, .webp). Niente GIF, video o siti web.");
-      return;
+    // CONTROLLO DI SICUREZZA: Solo l'Admin (Fronte ★) può inserire immagini
+    if (imageUrl !== "") {
+      if (!isUserAdmin()) {
+        alert("ATTENZIONE: Solo l'amministratore (Fronte ★) è autorizzato ad inserire immagini nei post!");
+        return;
+      }
+      if (!isValidImageUrl(imageUrl)) {
+        alert("Link immagine non valido! Usa solo immagini statiche (es. .jpg, .png, .webp).");
+        return;
+      }
     }
 
     try {
@@ -933,30 +939,27 @@
 
     try {
       const postRef = db.collection('stickwar_posts').doc(postId);
-      const doc = await postRef.get();
+      postRef.get().then(doc => {
+        if (!doc.exists) return;
+        let comments = doc.data().comments || [];
+        const targetComment = comments[commentIndex];
+        if (!targetComment) return;
 
-      if (!doc.exists) return;
+        const isCommentAuthor = targetComment.author === loggedUser;
+        const isAdmin = isUserAdmin();
 
-      let comments = doc.data().comments || [];
-      const targetComment = comments[commentIndex];
+        if (!isCommentAuthor && !isAdmin) {
+          alert("Non sei autorizzato a eliminare questo commento!");
+          return;
+        }
 
-      if (!targetComment) return;
+        if (!confirm("Vuoi eliminare questo commento?")) return;
 
-      const isCommentAuthor = targetComment.author === loggedUser;
-      const isAdmin = isUserAdmin();
-
-      if (!isCommentAuthor && !isAdmin) {
-        alert("Non sei autorizzato a eliminare questo commento!");
-        return;
-      }
-
-      if (!confirm("Vuoi eliminare questo commento?")) return;
-
-      comments.splice(commentIndex, 1);
-      await postRef.update({ comments: comments });
+        comments.splice(commentIndex, 1);
+        postRef.update({ comments: comments });
+      });
     } catch (e) {
       console.error("Errore durante l'eliminazione del commento:", e);
-      alert("Impossibile eliminare il commento.");
     }
   }
 
