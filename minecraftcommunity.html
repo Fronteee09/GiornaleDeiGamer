@@ -358,7 +358,7 @@
     <div class="add-post-form">
       <input type="text" id="postTitle" class="input-field" placeholder="Titolo del post..." required>
       <textarea id="postContent" class="input-field" placeholder="Scrivi il tuo messaggio..." required></textarea>
-      <!-- Campo immagine nascosto per gli utenti, visibile solo all'Admin -->
+      <!-- Campo immagine nascosto agli utenti standard, mostrato solo all'Admin -->
       <input type="text" id="postImageUrl" class="input-field" placeholder="URL Immagine (Solo per Fronte ★)" style="display: none;">
       <button class="submit-btn" onclick="createNewPost()">Pubblica Post</button>
     </div>
@@ -507,7 +507,6 @@
       const mailBtn = document.getElementById('adminMailBtn');
       if (mailBtn) mailBtn.style.display = 'block';
 
-      // Mostra il campo immagine solo all'Admin
       const imageInput = document.getElementById('postImageUrl');
       if (imageInput) imageInput.style.display = 'block';
 
@@ -515,7 +514,7 @@
     }
   });
 
-  // Caricamento post ORDINATI DAL PIÙ RECENTE AL PIÙ VECCHIO
+  // Caricamento post ordinati dal più recente al più vecchio con controllo like sicuro
   db.collection('posts').orderBy('timestamp', 'desc').onSnapshot((snapshot) => {
     const container = document.getElementById('postsContainer');
     container.innerHTML = '';
@@ -527,13 +526,14 @@
 
     const loggedUser = getLoggedUser();
     const cleanLogged = loggedUser ? loggedUser.trim().toLowerCase() : '';
-    const likedPostsKey = loggedUser ? ('gdg_liked_posts_' + cleanLogged) : '';
-    const likedPosts = loggedUser ? (JSON.parse(localStorage.getItem(likedPostsKey)) || []) : [];
     const isAdmin = isUserAdmin();
 
     snapshot.forEach((doc) => {
       const post = doc.data();
       const postId = doc.id;
+      
+      const likedBy = post.likedBy || [];
+      const hasLiked = cleanLogged ? likedBy.includes(cleanLogged) : false;
 
       const card = document.createElement('div');
       card.className = 'post-card';
@@ -545,7 +545,6 @@
       }
 
       const commentsCount = post.comments ? post.comments.length : 0;
-      const hasLiked = likedPosts.includes(postId);
       const likeBtnStyle = hasLiked 
         ? "background: rgba(56, 189, 248, 0.85); border-color: #ffffff;" 
         : "background: rgba(2, 132, 199, 0.5);";
@@ -571,7 +570,7 @@
         <p>${post.content}</p>
 
         <div class="post-actions">
-          <button class="like-btn" style="${likeBtnStyle}" onclick="addLike('${postId}', ${post.likes || 0}, '${(post.author || '').replace(/'/g, "\\'")}')">
+          <button class="like-btn" style="${likeBtnStyle}" onclick="addLike('${postId}', '${(post.author || '').replace(/'/g, "\\'")}')">
             👍 <span>${post.likes || 0}</span>
           </button>
           <button class="comment-toggle-btn" onclick="toggleComments('${postId}')">
@@ -603,12 +602,11 @@
     }
     
     const cleanLogged = loggedUser ? loggedUser.trim().toLowerCase() : '';
-    const likedCommentsKey = loggedUser ? ('gdg_liked_comments_' + cleanLogged) : '';
-    const likedComments = loggedUser ? (JSON.parse(localStorage.getItem(likedCommentsKey)) || []) : [];
 
     return comments.map((c, index) => {
-      const commentUid = `${postId}_${index}`;
-      const hasLikedComment = likedComments.includes(commentUid);
+      const commentLikedBy = c.likedBy || [];
+      const hasLikedComment = cleanLogged ? commentLikedBy.includes(cleanLogged) : false;
+      
       const commentLikeBtnStyle = hasLikedComment
         ? "background: rgba(56, 189, 248, 0.85); border-color: #ffffff;"
         : "background: rgba(2, 132, 199, 0.4);";
@@ -664,7 +662,6 @@
       return;
     }
 
-    // CONTROLLO DI SICUREZZA: Solo l'Admin può inserire immagini
     if (imageUrl !== "") {
       if (!isUserAdmin()) {
         alert("ATTENZIONE: Solo l'amministratore (Fronte ★) è autorizzato ad inserire immagini nei post!");
@@ -680,9 +677,10 @@
       await db.collection('posts').add({
         title: title,
         content: content,
-        imageUrl: isUserAdmin() ? imageUrl : "", // Evita che utenti non admin inviino immagini via script
+        imageUrl: isUserAdmin() ? imageUrl : "",
         author: author,
         likes: 0,
+        likedBy: [],
         comments: [],
         timestamp: firebase.firestore.FieldValue.serverTimestamp()
       });
@@ -696,7 +694,8 @@
     }
   }
 
-  async function addLike(postId, currentLikes, postAuthor) {
+  // GESTIONE LIKE SICURA LATO SERVER PER EVITARE BUG E SPAM
+  async function addLike(postId, postAuthor) {
     const loggedUser = getLoggedUser();
     if (!loggedUser) {
       alert("Devi accedere per mettere un like!");
@@ -705,24 +704,29 @@
     }
 
     const cleanLogged = loggedUser.trim().toLowerCase();
-    const likedPostsKey = 'gdg_liked_posts_' + cleanLogged;
-    let likedPosts = JSON.parse(localStorage.getItem(likedPostsKey)) || [];
     const postRef = db.collection('posts').doc(postId);
 
     try {
-      if (likedPosts.includes(postId)) {
-        likedPosts = likedPosts.filter(id => id !== postId);
-        const newLikes = Math.max(0, currentLikes - 1);
-        await postRef.update({ likes: newLikes });
-        await changeUserCoins(postAuthor, -5);
-      } else {
-        likedPosts.push(postId);
-        const newLikes = currentLikes + 1;
-        await postRef.update({ likes: newLikes });
-        await changeUserCoins(postAuthor, 5);
-      }
+      await db.runTransaction(async (transaction) => {
+        const postDoc = await transaction.get(postRef);
+        if (!postDoc.exists) return;
 
-      localStorage.setItem(likedPostsKey, JSON.stringify(likedPosts));
+        const postData = postDoc.data();
+        let likedBy = postData.likedBy || [];
+        let likes = postData.likes || 0;
+
+        if (likedBy.includes(cleanLogged)) {
+          likedBy = likedBy.filter(u => u !== cleanLogged);
+          likes = Math.max(0, likes - 1);
+          transaction.update(postRef, { likes: likes, likedBy: likedBy });
+          changeUserCoins(postAuthor, -5);
+        } else {
+          likedBy.push(cleanLogged);
+          likes = likes + 1;
+          transaction.update(postRef, { likes: likes, likedBy: likedBy });
+          changeUserCoins(postAuthor, 5);
+        }
+      });
     } catch (e) {
       console.error("Errore gestione like post:", e);
     }
@@ -737,34 +741,36 @@
     }
 
     const cleanLogged = loggedUser.trim().toLowerCase();
-    const likedCommentsKey = 'gdg_liked_comments_' + cleanLogged;
-    let likedComments = JSON.parse(localStorage.getItem(likedCommentsKey)) || [];
-    const commentUid = `${postId}_${commentIndex}`;
+    const postRef = db.collection('posts').doc(postId);
 
     try {
-      const postRef = db.collection('posts').doc(postId);
-      const doc = await postRef.get();
+      await db.runTransaction(async (transaction) => {
+        const postDoc = await transaction.get(postRef);
+        if (!postDoc.exists) return;
 
-      if (doc.exists) {
-        let comments = doc.data().comments || [];
+        let comments = postDoc.data().comments || [];
         if (!comments[commentIndex]) return;
 
-        let currentCommentLikes = comments[commentIndex].likes || 0;
+        let comment = comments[commentIndex];
+        let likedBy = comment.likedBy || [];
+        let likes = comment.likes || 0;
 
-        if (likedComments.includes(commentUid)) {
-          likedComments = likedComments.filter(id => id !== commentUid);
-          comments[commentIndex].likes = Math.max(0, currentCommentLikes - 1);
-          await postRef.update({ comments: comments });
-          await changeUserCoins(commentAuthor, -5);
+        if (likedBy.includes(cleanLogged)) {
+          likedBy = likedBy.filter(u => u !== cleanLogged);
+          likes = Math.max(0, likes - 1);
+          comment.likes = likes;
+          comment.likedBy = likedBy;
+          transaction.update(postRef, { comments: comments });
+          changeUserCoins(commentAuthor, -5);
         } else {
-          likedComments.push(commentUid);
-          comments[commentIndex].likes = currentCommentLikes + 1;
-          await postRef.update({ comments: comments });
-          await changeUserCoins(commentAuthor, 5);
+          likedBy.push(cleanLogged);
+          likes = likes + 1;
+          comment.likes = likes;
+          comment.likedBy = likedBy;
+          transaction.update(postRef, { comments: comments });
+          changeUserCoins(commentAuthor, 5);
         }
-
-        localStorage.setItem(likedCommentsKey, JSON.stringify(likedComments));
-      }
+      });
     } catch (e) {
       console.error("Errore gestione like commento:", e);
     }
@@ -798,6 +804,7 @@
           author: author,
           text: text,
           likes: 0,
+          likedBy: [],
           date: new Date().toISOString()
         });
 
